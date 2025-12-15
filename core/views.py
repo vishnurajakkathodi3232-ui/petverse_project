@@ -208,15 +208,17 @@ def owner_add_pet(request):
         return redirect("owner_pets")
 
     return render(request, "core/owner_add_pet.html")
-
-
 @login_required
 def owner_adoptions(request):
-    if not getattr(request.user, "has_pet", False):
-        return redirect("home")
+    requests = AdoptionRequest.objects.filter(
+        owned_pet__owner=request.user
+    )
 
-    # Placeholder for now — will show real requests later
-    return render(request, "core/owner_adoptions.html")
+    return render(
+        request,
+        "core/owner_adoptions.html",
+        {"requests": requests}
+    )
 
 
 @login_required
@@ -235,63 +237,41 @@ def owner_profile(request):
 
     return render(request, "core/owner_profile.html")
 
-
 @login_required
 def owner_approve_request(request, req_id):
-    """
-    Approve an adoption request that targets a pet owned by the logged-in owner.
-    We try to find the OwnedPet record for this owner and the requested pet,
-    transfer ownership to the adopter and delete the original OwnedPet.
-    """
-    req = get_object_or_404(AdoptionRequest, id=req_id)
+    req = get_object_or_404(
+        AdoptionRequest,
+        id=req_id,
+        owned_pet__owner=request.user
+    )
 
-    # Find the OwnedPet record for this pet and owner
-    owned = OwnedPet.objects.filter(pet=req.pet, owner=request.user).first()
-    if not owned:
-        # Owner is not the owner of this pet -> deny
-        return redirect("home")
-
-    # Ensure the owner in DB matches the logged in owner (sanity)
-    if owned.owner != request.user:
-        return redirect("home")
-
-    # Update request status
     req.status = "approved"
     req.save()
 
-    # Transfer ownership: create OwnedPet for adopter (attach same Pet instance)
+    # Transfer ownership
     OwnedPet.objects.create(
         owner=req.adopter,
-        pet=req.pet,
-        is_listed_for_adoption=False
+        pet=req.owned_pet.pet
     )
 
-    # Remove original owner's OwnedPet record
-    owned.delete()
-
-    # Mark the Pet as unavailable to prevent further adoption attempts
-    req.pet.is_available = False
-    req.pet.save()
+    # Remove old record
+    req.owned_pet.delete()
 
     return redirect("owner_adoptions")
 
-
 @login_required
 def owner_reject_request(request, req_id):
-    req = get_object_or_404(AdoptionRequest, id=req_id)
-
-    owned = OwnedPet.objects.filter(pet=req.pet, owner=request.user).first()
-    if not owned:
-        return redirect("home")
-
-    # Only the owner of that pet can reject
-    if owned.owner != request.user:
-        return redirect("home")
+    req = get_object_or_404(
+        AdoptionRequest,
+        id=req_id,
+        owned_pet__owner=request.user
+    )
 
     req.status = "declined"
     req.save()
 
     return redirect("owner_adoptions")
+
 @login_required
 def send_adoption_request(request, pet_id):
     # Only adopters can send requests
@@ -499,9 +479,47 @@ def adopter_favorites(request):
     return render(request, "core/favorites_adopter.html")
 
 
+from itertools import chain
+from .models import Pet, OwnedPet
+
+@login_required
 def pets_list(request):
-    pets = Pet.objects.filter(is_available=True)
-    return render(request, "core/pets_list.html", {"pets": pets})
+    # Only adopters can browse adoptable pets
+    if request.user.role != "adopter":
+        return redirect("home")
+
+    # Shelter pets
+    shelter_pets = Pet.objects.filter(is_available=True)
+
+    # Owner pets explicitly listed for adoption
+    owner_pets = OwnedPet.objects.filter(is_listed_for_adoption=True)
+
+    # Normalize data for template
+    combined_pets = []
+
+    for pet in shelter_pets:
+        combined_pets.append({
+            "id": pet.id,
+            "name": pet.name,
+            "category": pet.category,
+            "image": pet.image,
+            "source": "shelter",
+        })
+
+    for owned in owner_pets:
+        combined_pets.append({
+            "id": owned.id,
+            "name": owned.pet.name,
+            "category": owned.pet.category,
+            "image": owned.pet.image,
+            "source": "owner",
+        })
+
+    return render(
+        request,
+        "core/pets_list.html",
+        {"pets": combined_pets}
+    )
 
 
 def pet_detail(request, pet_id):
@@ -534,3 +552,59 @@ from django.contrib.auth.decorators import login_required
 @login_required
 def payment(request):
     return render(request, "core/payment.html")
+@login_required
+def owner_list_pet(request, pet_id):
+    owned_pet = get_object_or_404(OwnedPet, id=pet_id, owner=request.user)
+    owned_pet.is_listed_for_adoption = True
+    owned_pet.save()
+    return redirect("owner_pets")
+
+
+@login_required
+def owner_unlist_pet(request, pet_id):
+    owned_pet = get_object_or_404(OwnedPet, id=pet_id, owner=request.user)
+    owned_pet.is_listed_for_adoption = False
+    owned_pet.save()
+    return redirect("owner_pets")
+@login_required
+def send_owner_adoption_request(request, pet_id):
+    if request.user.role != "adopter":
+        return redirect("home")
+
+    owned_pet = get_object_or_404(
+        OwnedPet,
+        id=pet_id,
+        is_listed_for_adoption=True
+    )
+
+    # Prevent duplicate requests
+    if AdoptionRequest.objects.filter(
+        adopter=request.user,
+        owned_pet=owned_pet
+    ).exists():
+        return render(
+            request,
+            "core/request_status.html",
+            {"message": "You already requested this pet."}
+        )
+
+    if request.method == "POST":
+        message = request.POST.get("message")
+
+        AdoptionRequest.objects.create(
+            adopter=request.user,
+            owned_pet=owned_pet,
+            message=message
+        )
+
+        return render(
+            request,
+            "core/request_status.html",
+            {"message": "Adoption request sent successfully!"}
+        )
+
+    return render(
+        request,
+        "core/send_adoption_request.html",
+        {"pet": owned_pet.pet}
+    )

@@ -3,8 +3,9 @@
 {% block title %}My Pets | PetVerse{% endblock %}
 
 {% block content %}
-<h2>My Pets 🐾</h2>
-<p>Manage the pets you currently own.</p>
+
+<h2 class="mb-3">My Pets 🐾</h2>
+<p class="text-muted">Manage your pets and their adoption status.</p>
 
 <hr>
 
@@ -16,18 +17,34 @@
         <div class="panel panel-default">
             <div class="panel-body text-center">
 
-                {% if pet.image %}
-                    <img src="{{ pet.image.url }}" class="img-responsive" style="margin: 0 auto 10px; max-height: 160px;">
+                {% if pet.pet.image %}
+                    <img src="{{ pet.pet.image.url }}"
+                         class="img-responsive"
+                         style="margin:0 auto 10px; max-height:160px;">
                 {% endif %}
 
-                <h4>{{ pet.name }}</h4>
-                <p class="text-muted">{{ pet.pet_type }}</p>
+                <h4>{{ pet.pet.name }}</h4>
+                <p class="text-muted">{{ pet.pet.category }}</p>
+
+                {% if pet.is_listed_for_adoption %}
+                    <span class="label label-success">Listed for Adoption</span>
+                {% else %}
+                    <span class="label label-default">Private</span>
+                {% endif %}
 
                 <hr>
 
-                <a href="{% url 'owned_pet_detail' pet.id %}" class="btn btn-default btn-sm">
-                    View Details
-                </a>
+                {% if pet.is_listed_for_adoption %}
+                    <a href="{% url 'owner_unlist_pet' pet.id %}"
+                       class="btn btn-warning btn-sm">
+                        Remove from Adoption
+                    </a>
+                {% else %}
+                    <a href="{% url 'owner_list_pet' pet.id %}"
+                       class="btn btn-success btn-sm">
+                        Mark for Adoption
+                    </a>
+                {% endif %}
 
             </div>
         </div>
@@ -37,7 +54,7 @@
 </div>
 {% else %}
 <div class="alert alert-info">
-    You have no pets added yet.
+    You haven't added any pets yet.
 </div>
 {% endif %}
 

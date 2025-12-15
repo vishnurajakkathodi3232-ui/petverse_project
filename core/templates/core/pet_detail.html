@@ -1,56 +1,43 @@
-{% extends "core/base.html" %}
+{% extends "core/base_inner.html" %}
 
 {% block title %}{{ pet.name }} | PetVerse{% endblock %}
 
 {% block content %}
-<section id="team">
-    <div class="container">
 
-        <div class="row">
-            <div class="col-md-12">
-                <h2 class="wow fadeInUp">{{ pet.name }} 🐾</h2>
-            </div>
-        </div>
+<h2 class="mb-3">{{ pet.name }} 🐾</h2>
+<p class="text-muted">{{ pet.category }}</p>
+
+<hr>
+
+<div class="row">
+
+    <div class="col-md-5 col-sm-6">
+        {% if pet.image %}
+            <img src="{{ pet.image.url }}"
+                 class="img-responsive img-thumbnail"
+                 alt="{{ pet.name }}">
+        {% endif %}
+    </div>
+
+    <div class="col-md-7 col-sm-6">
+
+        <p>{{ pet.description }}</p>
 
         <hr>
 
-        <div class="row">
-
-            <div class="col-md-5 col-sm-6">
-                {% if pet.image %}
-                    <img src="{{ pet.image.url }}"
-                         class="img-responsive img-thumbnail wow fadeInUp"
-                         alt="{{ pet.name }}">
-                {% endif %}
+        {% if user.is_authenticated and user.role == "adopter" %}
+            <a href="{% url 'send_adoption_request' pet.id %}"
+               class="btn btn-success">
+                <i class="fa fa-heart"></i> Request Adoption
+            </a>
+        {% else %}
+            <div class="alert alert-warning">
+                Only adopters can request adoption.
             </div>
-
-            <div class="col-md-7 col-sm-6 wow fadeInUp">
-
-                <p>
-                    <strong>Category:</strong> {{ pet.category }}
-                </p>
-
-                <p>
-                    {{ pet.description }}
-                </p>
-
-                <hr>
-
-                {% if user.is_authenticated and user.role == "adopter" %}
-                    <a href="{% url 'send_adoption_request' pet.id %}"
-                       class="btn btn-success">
-                        <i class="fa fa-heart"></i> Request Adoption
-                    </a>
-                {% else %}
-                    <div class="alert alert-warning">
-                        Only adopters can request adoption.
-                    </div>
-                {% endif %}
-
-            </div>
-
-        </div>
+        {% endif %}
 
     </div>
-</section>
+
+</div>
+
 {% endblock %}

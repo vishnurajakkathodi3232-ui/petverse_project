@@ -50,6 +50,15 @@ urlpatterns = [
     path("shelter/adoptions/decline/<int:req_id>/", views.decline_request, name="decline_request"),
     path("chat/", views.chat, name="chat"),
     path("payments/", views.payment, name="payment"),
+    path("owner/pets/list/<int:pet_id>/", views.owner_list_pet, name="owner_list_pet"),
+    path("owner/pets/unlist/<int:pet_id>/", views.owner_unlist_pet, name="owner_unlist_pet"),
+    path("adopt/owner/<int:pet_id>/",views.send_owner_adoption_request,name="send_owner_adoption_request"),
+
+    path("owner/adoptions/approve/<int:req_id>/",views.owner_approve_request,name="owner_approve_request"),
+
+    path("owner/adoptions/reject/<int:req_id>/",views.owner_reject_request,name="owner_reject_request"),
+
+
 
 
 ]

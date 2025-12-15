@@ -59,7 +59,6 @@ class OwnedPet(models.Model):
     def __str__(self):
         return f"{self.pet.name} owned by {self.owner.username}"
 
-
 class AdoptionRequest(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -68,11 +67,28 @@ class AdoptionRequest(models.Model):
     ]
 
     adopter = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
+
+    # Shelter pet adoption
+    pet = models.ForeignKey(
+        Pet,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
+    # Owner pet adoption
+    owned_pet = models.ForeignKey(
+        OwnedPet,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
     message = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.adopter.username} → {self.pet.name} ({self.status})"
+        target = self.pet.name if self.pet else self.owned_pet.pet.name
+        return f"{self.adopter.username} → {target}"

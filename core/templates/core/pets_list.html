@@ -1,66 +1,61 @@
-{% extends "core/base.html" %}
+{% extends "core/base_inner.html" %}
 
 {% block title %}Available Pets | PetVerse{% endblock %}
 
 {% block content %}
-<section id="team">
-    <div class="container">
 
-        <div class="row">
-            <div class="col-md-12">
-                <h2 class="wow fadeInUp">Available Pets 🐾</h2>
-                <p class="text-muted">Browse pets available for adoption.</p>
+<h2 class="mb-3">Available Pets 🐾</h2>
+<p class="text-muted">Browse pets available for adoption.</p>
+
+<hr>
+
+<div class="row">
+
+{% for pet in pets %}
+    <div class="col-md-4 col-sm-6">
+        <div class="team-thumb">
+
+            {% if pet.image %}
+                <img src="{{ pet.image.url }}"
+                     class="img-responsive"
+                     alt="{{ pet.name }}">
+            {% endif %}
+
+            <div class="team-info text-center">
+                <h3>{{ pet.name }}</h3>
+                <p class="text-muted">{{ pet.category }}</p>
+
+                {% if pet.source == "shelter" %}
+                    <span class="label label-success">Shelter Pet</span>
+                {% else %}
+                    <span class="label label-info">Owner Pet</span>
+                {% endif %}
+
+                <br><br>
+
+                {% if pet.source == "shelter" %}
+                    <a href="{% url 'pet_detail' pet.id %}"
+                       class="btn btn-primary btn-sm">
+                        View Details
+                    </a>
+                {% else %}
+                    <a href="{% url 'owned_pet_detail' pet.id %}"
+                       class="btn btn-primary btn-sm">
+                        View Details
+                    </a>
+                {% endif %}
             </div>
-        </div>
-
-        <hr>
-
-        <div class="row">
-
-            {% for pet in pets %}
-            <div class="col-md-4 col-sm-6">
-                <div class="team-thumb wow fadeInUp">
-
-                    {% if pet.image %}
-                        <img src="{{ pet.image.url }}" class="img-responsive" alt="{{ pet.name }}">
-                    {% endif %}
-
-                    <div class="team-info">
-                        <h3>{{ pet.name }}</h3>
-
-                        {% if pet.type == 'shelter' %}
-                            <span class="label label-success">Shelter Pet</span>
-                        {% else %}
-                            <span class="label label-info">Owner Pet</span>
-                        {% endif %}
-
-                        <br><br>
-
-                        {% if pet.type == 'shelter' %}
-                            <a href="{% url 'pet_detail' pet.id %}"
-                               class="btn btn-primary btn-sm">
-                                View Details
-                            </a>
-                        {% else %}
-                            <a href="{% url 'owned_pet_detail' pet.id %}"
-                               class="btn btn-primary btn-sm">
-                                View Details
-                            </a>
-                        {% endif %}
-                    </div>
-
-                </div>
-            </div>
-            {% empty %}
-            <div class="col-md-12">
-                <div class="alert alert-info">
-                    No pets are currently available for adoption.
-                </div>
-            </div>
-            {% endfor %}
 
         </div>
-
     </div>
-</section>
+{% empty %}
+    <div class="col-md-12">
+        <div class="alert alert-info">
+            No pets are currently available for adoption.
+        </div>
+    </div>
+{% endfor %}
+
+</div>
+
 {% endblock %}

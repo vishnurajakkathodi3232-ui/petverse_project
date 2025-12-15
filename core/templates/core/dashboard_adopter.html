@@ -3,45 +3,106 @@
 {% block title %}Adopter Dashboard | PetVerse{% endblock %}
 
 {% block content %}
-<h2>Welcome, {{ user.first_name|default:user.username }} 👋</h2>
-<p>This is your adopter dashboard.</p>
+
+<h2 class="mb-3">Welcome, {{ user.first_name|default:user.username }} 👋</h2>
+<p class="text-muted">Manage your adoptions, favorite pets, and activities.</p>
 
 <hr>
 
 <div class="row">
+
+    <!-- BROWSE PETS -->
     <div class="col-md-4">
         <div class="panel panel-default">
-            <div class="panel-body">
-                <h4><i class="fa fa-paw"></i> Browse Pets</h4>
-                <p>Find pets waiting for a loving home.</p>
+            <div class="panel-body text-center">
+                <i class="fa fa-paw fa-3x text-primary"></i>
+                <h4 class="mt-2">Browse Pets</h4>
+                <p class="text-muted">Find your next companion</p>
+                <a href="{% url 'pets_list' %}" class="btn btn-primary btn-sm">
+                    Explore
+                </a>
             </div>
         </div>
     </div>
 
+    <!-- MY ADOPTIONS -->
     <div class="col-md-4">
         <div class="panel panel-default">
-            <div class="panel-body">
-                <h4><i class="fa fa-heart"></i> My Requests</h4>
-                <p>Track your adoption requests.</p>
+            <div class="panel-body text-center">
+                <i class="fa fa-heart fa-3x text-danger"></i>
+                <h4 class="mt-2">My Adoptions</h4>
+                <p class="text-muted">Track adoption requests</p>
+                <a href="{% url 'adopter_adoptions' %}" class="btn btn-danger btn-sm">
+                    View
+                </a>
             </div>
         </div>
     </div>
 
+    <!-- FAVORITES -->
     <div class="col-md-4">
         <div class="panel panel-default">
-            <div class="panel-body">
-                <h4><i class="fa fa-comments"></i> Chat</h4>
-                <p>Talk with shelters and owners.</p>
+            <div class="panel-body text-center">
+                <i class="fa fa-star fa-3x text-warning"></i>
+                <h4 class="mt-2">Favorites</h4>
+                <p class="text-muted">Pets you saved</p>
+                <a href="{% url 'adopter_favorites' %}" class="btn btn-warning btn-sm">
+                    Open
+                </a>
             </div>
         </div>
     </div>
+
 </div>
 
+<hr>
+
+<div class="row">
+
+    <!-- APPOINTMENTS -->
+    <div class="col-md-6">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <strong><i class="fa fa-calendar"></i> Appointments</strong>
+            </div>
+            <div class="panel-body">
+                <p class="text-muted">
+                    View or schedule vet appointments.
+                </p>
+                <a href="{% url 'adopter_appointments' %}" class="btn btn-info btn-sm">
+                    Manage Appointments
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="col-md-6">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <strong><i class="fa fa-comments"></i> Chat Support</strong>
+            </div>
+            <div class="panel-body">
+                <p class="text-muted">
+                    Talk to shelters, owners, or support.
+                </p>
+                <a href="#" class="btn btn-success btn-sm">
+                    Open Chat
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% comment %}
+OWNER ACCESS UNLOCK MESSAGE
+{% endcomment %}
 {% if user.ownedpet_set.all %}
 <hr>
 <div class="alert alert-success">
-    🎉 You are now also an <strong>Owner</strong>!  
-    Owner features are unlocked in the sidebar.
+    <strong>🎉 Owner Access Unlocked!</strong><br>
+    You can now manage pets and receive adoption requests.
 </div>
 {% endif %}
 
