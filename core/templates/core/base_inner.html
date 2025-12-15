@@ -1,0 +1,273 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}PetVerse{% endblock %}</title>
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="{% static 'core/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/animate.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/tooplate-style.css' %}">
+
+    <style>
+        body {
+            background: #f5f7fa;
+        }
+
+        /* Layout */
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: #ffffff;
+            border-right: 1px solid #e6e6e6;
+            padding-top: 20px;
+        }
+
+        .sidebar h4 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #777;
+            letter-spacing: 0.5px;
+            padding-left: 20px;
+            margin-bottom: 10px;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .sidebar ul li {
+            padding: 2px 20px;
+        }
+
+        .sidebar ul li a {
+            color: #333;
+            display: block;
+            text-decoration: none;
+            padding: 8px 10px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar ul li a i {
+            margin-right: 10px;
+            width: 18px;
+        }
+
+        .sidebar ul li a:hover {
+            background: #f0f4ff;
+            color: #2b5cff;
+        }
+
+        .sidebar ul li a.active {
+            background: #2b5cff;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .sidebar ul li a.active i {
+            color: #ffffff;
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        /* Topbar */
+        .topbar {
+            background: #ffffff;
+            border-bottom: 1px solid #e6e6e6;
+            padding: 12px 30px;
+        }
+
+        .topbar .brand {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .topbar .user-area {
+            float: right;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+<!-- TOP NAVBAR -->
+<div class="topbar clearfix">
+    <span class="brand">
+        <i class="fa fa-paw"></i> PetVerse
+    </span>
+
+    <div class="user-area">
+        <span>{{ user.first_name|default:user.username }}</span>
+        |
+        <a href="{% url 'logout' %}">Logout</a>
+    </div>
+</div>
+
+<div class="app-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <!-- ADOPTER MENU -->
+        {% if user.role == "adopter" %}
+        <h4>Adopter</h4>
+        <ul>
+            <li>
+                <a href="{% url 'adopter_dashboard' %}"
+                   class="{% if request.resolver_match.url_name == 'adopter_dashboard' %}active{% endif %}">
+                    <i class="fa fa-dashboard"></i> Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'pets_list' %}"
+                   class="{% if request.resolver_match.url_name == 'pets_list' %}active{% endif %}">
+                    <i class="fa fa-paw"></i> Browse Pets
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'adopter_adoptions' %}"
+                   class="{% if request.resolver_match.url_name == 'adopter_adoptions' %}active{% endif %}">
+                    <i class="fa fa-heart"></i> My Adoptions
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'adopter_favorites' %}"
+                   class="{% if request.resolver_match.url_name == 'adopter_favorites' %}active{% endif %}">
+                    <i class="fa fa-star"></i> Favorites
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'adopter_appointments' %}"
+                   class="{% if request.resolver_match.url_name == 'adopter_appointments' %}active{% endif %}">
+                    <i class="fa fa-calendar"></i> Appointments
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'chat' %}"
+                   class="{% if request.resolver_match.url_name == 'chat' %}active{% endif %}">
+                    <i class="fa fa-comments"></i> Chat
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'payment' %}"
+                    class="{% if request.resolver_match.url_name == 'payment' %}active{% endif %}">
+                    <i class="fa fa-credit-card"></i> Payments
+                </a>
+
+            </li>
+
+            <li>
+                <a href="{% url 'adopter_profile' %}"
+                   class="{% if request.resolver_match.url_name == 'adopter_profile' %}active{% endif %}">
+                    <i class="fa fa-user"></i> Profile
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+
+        <!-- OWNER MENU -->
+        {% if user.ownedpet_set.all %}
+        <h4>Owner</h4>
+        <ul>
+            <li>
+                <a href="{% url 'owner_pets' %}"
+                   class="{% if request.resolver_match.url_name == 'owner_pets' %}active{% endif %}">
+                    <i class="fa fa-paw"></i> My Pets
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'owner_adoptions' %}"
+                   class="{% if request.resolver_match.url_name == 'owner_adoptions' %}active{% endif %}">
+                    <i class="fa fa-check-circle"></i> Requests
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'chat' %}"
+                   class="{% if request.resolver_match.url_name == 'chat' %}active{% endif %}">
+                    <i class="fa fa-comments"></i> Chat
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+
+        <!-- SHELTER MENU -->
+        {% if user.role == "shelter" %}
+        <h4>Shelter</h4>
+        <ul>
+            <li>
+                <a href="{% url 'shelter_dashboard' %}"
+                   class="{% if request.resolver_match.url_name == 'shelter_dashboard' %}active{% endif %}">
+                    <i class="fa fa-dashboard"></i> Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'shelter_pets' %}"
+                   class="{% if request.resolver_match.url_name == 'shelter_pets' %}active{% endif %}">
+                    <i class="fa fa-paw"></i> Shelter Pets
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'shelter_adoptions' %}"
+                   class="{% if request.resolver_match.url_name == 'shelter_adoptions' %}active{% endif %}">
+                    <i class="fa fa-heart"></i> Adoptions
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'chat' %}"
+                   class="{% if request.resolver_match.url_name == 'chat' %}active{% endif %}">
+                    <i class="fa fa-comments"></i> Chat
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'shelter_profile' %}"
+                   class="{% if request.resolver_match.url_name == 'shelter_profile' %}active{% endif %}">
+                    <i class="fa fa-user"></i> Profile
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+</div>
+
+<script src="{% static 'core/js/jquery.js' %}"></script>
+<script src="{% static 'core/js/bootstrap.min.js' %}"></script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

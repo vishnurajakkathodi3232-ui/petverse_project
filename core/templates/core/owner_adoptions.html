@@ -1,44 +1,66 @@
-{% extends "core/base.html" %}
+{% extends "core/base_inner.html" %}
+
+{% block title %}Adoption Requests | PetVerse{% endblock %}
 
 {% block content %}
-<div class="container" style="margin-top:150px;">
+<h2>Adoption Requests 📩</h2>
+<p>Review adoption requests for your pets.</p>
 
-    <h2>Adoption Requests</h2>
-    <p>Here you can review adoption requests for your pets.</p>
+<hr>
 
-    {% if requests %}
-        <ul class="list-group">
+{% if requests %}
+<div class="row">
 
-            {% for req in requests %}
-                <li class="list-group-item">
+    {% for req in requests %}
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
 
-                    <strong>Pet:</strong> {{ req.owned_pet.name }} <br>
+                <h4>
+                    <i class="fa fa-paw"></i>
+                    {{ req.owned_pet.name }}
+                </h4>
+
+                <p>
                     <strong>Adopter:</strong> {{ req.adopter.username }} <br>
-                    <strong>Message:</strong> {{ req.message }} <br>
-                    <strong>Status:</strong> {{ req.status|title }}
+                    <strong>Message:</strong>
+                    {{ req.message|default:"No message provided." }}
+                </p>
 
-                    <br><br>
-
+                <p>
+                    <strong>Status:</strong>
                     {% if req.status == "pending" %}
-                        <a href="{% url 'owner_approve_request' req.id %}" 
-                           class="btn btn-success btn-sm">
-                           Approve
-                        </a>
-
-                        <a href="{% url 'owner_reject_request' req.id %}" 
-                           class="btn btn-danger btn-sm">
-                           Reject
-                        </a>
+                        <span class="label label-warning">Pending</span>
+                    {% elif req.status == "approved" %}
+                        <span class="label label-success">Approved</span>
+                    {% else %}
+                        <span class="label label-danger">Rejected</span>
                     {% endif %}
+                </p>
 
-                </li>
-            {% endfor %}
+                {% if req.status == "pending" %}
+                <hr>
+                <a href="{% url 'owner_approve_request' req.id %}"
+                   class="btn btn-success btn-sm">
+                    <i class="fa fa-check"></i> Approve
+                </a>
 
-        </ul>
+                <a href="{% url 'owner_reject_request' req.id %}"
+                   class="btn btn-danger btn-sm">
+                    <i class="fa fa-times"></i> Reject
+                </a>
+                {% endif %}
 
-    {% else %}
-        <p>No adoption requests yet.</p>
-    {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
 
 </div>
+{% else %}
+<div class="alert alert-info">
+    No adoption requests yet.
+</div>
+{% endif %}
+
 {% endblock %}

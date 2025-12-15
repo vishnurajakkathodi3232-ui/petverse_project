@@ -1,16 +1,65 @@
-{% extends "core/base.html" %}
+{% extends "core/base_inner.html" %}
+
+{% block title %}Owner Dashboard | PetVerse{% endblock %}
 
 {% block content %}
-<div class="container" style="margin-top:150px;">
-    <h2>Owner Dashboard</h2>
-    <p>Welcome, {{ user.first_name|default:user.username }}!</p>
+<h2>Welcome, {{ user.first_name|default:user.username }} 👋</h2>
+<p>This is your owner dashboard.</p>
 
-    <ul>
-        <li><a href="{% url 'owner_pets' %}">My Pets</a></li>
-        <li><a href="{% url 'owner_add_pet' %}">Add a Pet</a></li>
-        <li><a href="{% url 'owner_adoptions' %}">Adoption Requests</a></li>
-        <li><a href="{% url 'owner_appointments' %}">Vet Appointments</a></li>
-        <li><a href="{% url 'owner_profile' %}">Profile</a></li>
-    </ul>
+<hr>
+
+<div class="row">
+
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4><i class="fa fa-paw"></i> My Pets</h4>
+                <p>View and manage your pets.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4><i class="fa fa-plus-circle"></i> Add a Pet</h4>
+                <p>Add a new pet to your profile.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4><i class="fa fa-check-circle"></i> Adoption Requests</h4>
+                <p>Review and respond to adoption requests.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<hr>
+
+<div class="row">
+
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4><i class="fa fa-calendar"></i> Vet Appointments</h4>
+                <p>Manage veterinary appointments.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4><i class="fa fa-user"></i> Profile</h4>
+                <p>Update your personal information.</p>
+            </div>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

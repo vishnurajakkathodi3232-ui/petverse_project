@@ -1,16 +1,65 @@
-{% extends "core/base.html" %}
+{% extends "core/base_inner.html" %}
+
+{% block title %}Shelter Dashboard | PetVerse{% endblock %}
 
 {% block content %}
-<div class="container" style="margin-top:150px;">
-    <h2>Shelter Dashboard</h2>
-    <p>Welcome, {{ user.first_name }}!</p>
+<h2>Welcome, {{ user.first_name|default:user.username }} 👋</h2>
+<p>This is your shelter dashboard.</p>
 
-    <ul>
-        <li><a href="{% url 'shelter_pets' %}">Manage Pets</a></li>
-        <li><a href="{% url 'shelter_add_pet' %}">Add Pet</a></li>
-        <li><a href="{% url 'shelter_adoptions' %}">Adoption Requests</a></li>
-        <li><a href="{% url 'shelter_profile' %}">Shelter Profile</a></li>
-    </ul>
+<hr>
+
+<div class="row">
+
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4><i class="fa fa-paw"></i> Manage Pets</h4>
+                <p>View and manage pets added by your shelter.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4><i class="fa fa-plus-circle"></i> Add Pet</h4>
+                <p>Add new pets available for adoption.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4><i class="fa fa-heart"></i> Adoption Requests</h4>
+                <p>Review and manage adoption requests.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<hr>
+
+<div class="row">
+
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4><i class="fa fa-user"></i> Shelter Profile</h4>
+                <p>Update shelter details and information.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4><i class="fa fa-comments"></i> Chat</h4>
+                <p>Communicate with adopters and owners.</p>
+            </div>
+        </div>
+    </div>
 
 </div>
 {% endblock %}

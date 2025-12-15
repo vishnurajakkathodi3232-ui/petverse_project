@@ -48,4 +48,8 @@ urlpatterns = [
     path("shelter/adoptions/", views.shelter_adoptions, name="shelter_adoptions"),
     path("shelter/adoptions/approve/<int:req_id>/", views.approve_request, name="approve_request"),
     path("shelter/adoptions/decline/<int:req_id>/", views.decline_request, name="decline_request"),
+    path("chat/", views.chat, name="chat"),
+    path("payments/", views.payment, name="payment"),
+
+
 ]

@@ -1,0 +1,89 @@
+{% extends "core/base_inner.html" %}
+
+{% block title %}Chat | PetVerse{% endblock %}
+
+{% block content %}
+<h2>Chat 💬</h2>
+<p class="text-muted">Communicate with adopters, owners, or shelters.</p>
+
+<hr>
+
+<div class="row">
+
+    <!-- CHAT LIST (LEFT) -->
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <strong>Conversations</strong>
+            </div>
+            <div class="panel-body" style="padding:0">
+
+                <ul class="list-group" style="margin-bottom:0">
+                    <li class="list-group-item active">
+                        Shelter Support
+                    </li>
+                    <li class="list-group-item">
+                        Owner: John
+                    </li>
+                    <li class="list-group-item">
+                        Adopter: Alice
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- CHAT WINDOW (RIGHT) -->
+    <div class="col-md-8">
+        <div class="panel panel-default">
+
+            <div class="panel-heading">
+                <strong>Conversation</strong>
+            </div>
+
+            <div class="panel-body" style="height:320px; overflow-y:auto; background:#f9f9f9;">
+
+                <!-- Incoming -->
+                <div style="margin-bottom:15px;">
+                    <strong>Shelter:</strong>
+                    <p class="well well-sm" style="display:inline-block;">
+                        Hello! How can we help you today?
+                    </p>
+                </div>
+
+                <!-- Outgoing -->
+                <div style="margin-bottom:15px; text-align:right;">
+                    <strong>You:</strong>
+                    <p class="well well-sm" style="display:inline-block; background:#d9edf7;">
+                        I’m interested in adopting Buddy.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- INPUT -->
+            <div class="panel-footer">
+                <form>
+                    <div class="input-group">
+                        <input type="text"
+                               class="form-control"
+                               placeholder="Type your message..."
+                               disabled>
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" disabled>
+                                Send
+                            </button>
+                        </span>
+                    </div>
+                    <small class="text-muted">
+                        Chat functionality will be enabled soon.
+                    </small>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -522,3 +522,15 @@ def shelter_delete_pet(request, pet_id):
 def owned_pet_detail(request, pet_id):
     pet = get_object_or_404(OwnedPet, id=pet_id)
     return render(request, "core/owned_pet_detail.html", {"pet": pet})
+
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def chat(request):
+    return render(request, "core/chat.html")
+
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def payment(request):
+    return render(request, "core/payment.html")

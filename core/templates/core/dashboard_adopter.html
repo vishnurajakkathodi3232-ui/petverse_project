@@ -1,31 +1,48 @@
-{% extends "core/base.html" %}
+{% extends "core/base_inner.html" %}
+
+{% block title %}Adopter Dashboard | PetVerse{% endblock %}
 
 {% block content %}
-<div class="container" style="margin-top:150px;">
-    <h2>Adopter Dashboard</h2>
-    <p>Welcome, {{ user.first_name|default:user.username }}!</p>
+<h2>Welcome, {{ user.first_name|default:user.username }} 👋</h2>
+<p>This is your adopter dashboard.</p>
 
-    <ul>
-        <li><a href="{% url 'adopter_profile' %}">Profile</a></li>
-        <li><a href="{% url 'adopter_adoptions' %}">Adoption Requests</a></li>
-        <li><a href="{% url 'adopter_favorites' %}">Saved Pets</a></li>
-        <li><a href="{% url 'adopter_appointments' %}">Appointments</a></li>
-    </ul>
+<hr>
 
-    {% comment %}
-        Unlock OWNER FEATURES automatically:
-        If adopter has at least one owned pet → show owner menu
-    {% endcomment %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4><i class="fa fa-paw"></i> Browse Pets</h4>
+                <p>Find pets waiting for a loving home.</p>
+            </div>
+        </div>
+    </div>
 
-    {% if user.ownedpet_set.all %}
-        <hr>
-        <h4>You Now Have Owner Access</h4>
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4><i class="fa fa-heart"></i> My Requests</h4>
+                <p>Track your adoption requests.</p>
+            </div>
+        </div>
+    </div>
 
-        <ul>
-            <li><a href="{% url 'owner_pets' %}">My Pets</a></li>
-            <li><a href="{% url 'owner_add_pet' %}">Add a Pet</a></li>
-            <li><a href="{% url 'owner_adoptions' %}">Adoption Requests</a></li>
-        </ul>
-    {% endif %}
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4><i class="fa fa-comments"></i> Chat</h4>
+                <p>Talk with shelters and owners.</p>
+            </div>
+        </div>
+    </div>
 </div>
+
+{% if user.ownedpet_set.all %}
+<hr>
+<div class="alert alert-success">
+    🎉 You are now also an <strong>Owner</strong>!  
+    Owner features are unlocked in the sidebar.
+</div>
+{% endif %}
+
 {% endblock %}

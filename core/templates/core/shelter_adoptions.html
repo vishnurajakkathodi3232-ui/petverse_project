@@ -1,28 +1,66 @@
-{% extends "core/base.html" %}
+{% extends "core/base_inner.html" %}
+
+{% block title %}Shelter Adoption Requests | PetVerse{% endblock %}
 
 {% block content %}
-<div class="container" style="margin-top:150px;">
+<h2>Adoption Requests 📥</h2>
+<p>Review and manage adoption requests for your shelter pets.</p>
 
-    <h2>Adoption Requests</h2>
+<hr>
 
-    {% if requests %}
-        <ul>
-            {% for r in requests %}
-                <li>
-                    <strong>Pet:</strong> {{ r.pet.name }} <br>
+{% if requests %}
+<div class="row">
+
+    {% for r in requests %}
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
+
+                <h4>
+                    <i class="fa fa-paw"></i>
+                    {{ r.pet.name }}
+                </h4>
+
+                <p>
                     <strong>Adopter:</strong> {{ r.adopter.username }} <br>
-                    <strong>Message:</strong> {{ r.message }} <br>
-                    <strong>Status:</strong> {{ r.status }} <br>
+                    <strong>Message:</strong>
+                    {{ r.message|default:"No message provided." }}
+                </p>
 
-                    <a href="{% url 'approve_request' r.id %}" class="btn btn-success btn-sm">Approve</a>
-                    <a href="{% url 'decline_request' r.id %}" class="btn btn-danger btn-sm">Decline</a>
-                </li>
+                <p>
+                    <strong>Status:</strong>
+                    {% if r.status == "pending" %}
+                        <span class="label label-warning">Pending</span>
+                    {% elif r.status == "approved" %}
+                        <span class="label label-success">Approved</span>
+                    {% else %}
+                        <span class="label label-danger">Declined</span>
+                    {% endif %}
+                </p>
+
+                {% if r.status == "pending" %}
                 <hr>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No adoption requests yet.</p>
-    {% endif %}
+                <a href="{% url 'approve_request' r.id %}"
+                   class="btn btn-success btn-sm">
+                    <i class="fa fa-check"></i> Approve
+                </a>
+
+                <a href="{% url 'decline_request' r.id %}"
+                   class="btn btn-danger btn-sm">
+                    <i class="fa fa-times"></i> Decline
+                </a>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+    {% endfor %}
 
 </div>
+{% else %}
+<div class="alert alert-info">
+    No adoption requests yet.
+</div>
+{% endif %}
+
 {% endblock %}

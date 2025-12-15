@@ -1,0 +1,86 @@
+{% extends "core/base_inner.html" %}
+
+{% block title %}Payments | PetVerse{% endblock %}
+
+{% block content %}
+<h2>Payments 💳</h2>
+<p class="text-muted">
+    Complete payments for adoption, appointments, or shopping.
+</p>
+
+<hr>
+
+<div class="row">
+
+    <!-- ADOPTION PAYMENT -->
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body text-center">
+                <i class="fa fa-paw fa-2x text-primary"></i>
+                <h4 style="margin-top:10px;">Pet Adoption</h4>
+                <p>Adoption fee for your selected pet.</p>
+
+                <h5><strong>₹ 2,000</strong></h5>
+
+                <button class="btn btn-primary btn-sm" disabled>
+                    Pay Now
+                </button>
+
+                <p class="text-muted" style="margin-top:10px;">
+                    Payment gateway will be enabled soon.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- APPOINTMENT PAYMENT -->
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body text-center">
+                <i class="fa fa-stethoscope fa-2x text-success"></i>
+                <h4 style="margin-top:10px;">Vet Appointment</h4>
+                <p>Consultation & medical services.</p>
+
+                <h5><strong>₹ 500</strong></h5>
+
+                <button class="btn btn-success btn-sm" disabled>
+                    Pay Now
+                </button>
+
+                <p class="text-muted" style="margin-top:10px;">
+                    Payment gateway will be enabled soon.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHOP PAYMENT -->
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body text-center">
+                <i class="fa fa-shopping-cart fa-2x text-warning"></i>
+                <h4 style="margin-top:10px;">Pet Products</h4>
+                <p>Food, toys, and accessories.</p>
+
+                <h5><strong>₹ 1,200</strong></h5>
+
+                <button class="btn btn-warning btn-sm" disabled>
+                    Pay Now
+                </button>
+
+                <p class="text-muted" style="margin-top:10px;">
+                    Shopping payments coming soon.
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<hr>
+
+<div class="alert alert-info">
+    <strong>Note:</strong> Online payments will be integrated using Razorpay in a future update.
+</div>
+
+{% endblock %}
