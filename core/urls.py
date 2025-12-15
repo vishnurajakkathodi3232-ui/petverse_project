@@ -1,0 +1,51 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+
+    # -------------------- PUBLIC ROUTES --------------------
+    path("", views.home, name="home"),
+    path("appointment/", views.make_appointment, name="appointment"),
+    path("signup/", views.signup, name="signup"),
+    path("login/", views.user_login, name="login"),
+    path("logout/", views.user_logout, name="logout"),
+    path("pets/", views.pets_list, name="pets_list"),
+    path("pet/<int:pet_id>/", views.pet_detail, name="pet_detail"),
+
+    # -------------------- ADOPTER ROUTES --------------------
+    path("adopter/dashboard/", views.adopter_dashboard, name="adopter_dashboard"),
+    path("adopter/profile/", views.adopter_profile, name="adopter_profile"),
+    path("adopter/adoptions/", views.adopter_adoptions, name="adopter_adoptions"),
+    path("adopter/favorites/", views.adopter_favorites, name="adopter_favorites"),
+    path("adopter/appointments/", views.adopter_appointments, name="adopter_appointments"),
+
+    # Adoption action (adopter requesting adoption)
+    path("adopt/<int:pet_id>/", views.send_adoption_request, name="send_adoption_request"),
+
+    # -------------------- OWNER ROUTES --------------------
+    path("owner/dashboard/", views.owner_dashboard, name="owner_dashboard"),
+    path("owner/pets/", views.owner_pets, name="owner_pets"),
+    path("owner/pets/add/", views.owner_add_pet, name="owner_add_pet"),
+    path("owner/adoptions/", views.owner_adoptions, name="owner_adoptions"),
+    path("owner/adoptions/approve/<int:req_id>/", views.owner_approve_request, name="owner_approve_request"),
+    path("owner/adoptions/reject/<int:req_id>/", views.owner_reject_request, name="owner_reject_request"),
+    path("owner/appointments/", views.owner_appointments, name="owner_appointments"),
+    path("owner/profile/", views.owner_profile, name="owner_profile"),
+
+    # Owned Pet Detail
+    path("owned-pet/<int:pet_id>/", views.owned_pet_detail, name="owned_pet_detail"),
+
+    # -------------------- SHELTER ROUTES --------------------
+    path("shelter/signup/", views.shelter_signup, name="shelter_signup"),
+    path("shelter/dashboard/", views.shelter_dashboard, name="shelter_dashboard"),
+    path("shelter/profile/", views.shelter_profile, name="shelter_profile"),
+    path("shelter/pets/", views.shelter_pets, name="shelter_pets"),
+    path("shelter/pets/add/", views.shelter_add_pet, name="shelter_add_pet"),
+    path("shelter/pets/edit/<int:pet_id>/", views.shelter_edit_pet, name="shelter_edit_pet"),
+    path("shelter/pets/delete/<int:pet_id>/", views.shelter_delete_pet, name="shelter_delete_pet"),
+
+    # Shelter adoption actions
+    path("shelter/adoptions/", views.shelter_adoptions, name="shelter_adoptions"),
+    path("shelter/adoptions/approve/<int:req_id>/", views.approve_request, name="approve_request"),
+    path("shelter/adoptions/decline/<int:req_id>/", views.decline_request, name="decline_request"),
+]

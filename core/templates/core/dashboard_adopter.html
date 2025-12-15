@@ -1,0 +1,31 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container" style="margin-top:150px;">
+    <h2>Adopter Dashboard</h2>
+    <p>Welcome, {{ user.first_name|default:user.username }}!</p>
+
+    <ul>
+        <li><a href="{% url 'adopter_profile' %}">Profile</a></li>
+        <li><a href="{% url 'adopter_adoptions' %}">Adoption Requests</a></li>
+        <li><a href="{% url 'adopter_favorites' %}">Saved Pets</a></li>
+        <li><a href="{% url 'adopter_appointments' %}">Appointments</a></li>
+    </ul>
+
+    {% comment %}
+        Unlock OWNER FEATURES automatically:
+        If adopter has at least one owned pet → show owner menu
+    {% endcomment %}
+
+    {% if user.ownedpet_set.all %}
+        <hr>
+        <h4>You Now Have Owner Access</h4>
+
+        <ul>
+            <li><a href="{% url 'owner_pets' %}">My Pets</a></li>
+            <li><a href="{% url 'owner_add_pet' %}">Add a Pet</a></li>
+            <li><a href="{% url 'owner_adoptions' %}">Adoption Requests</a></li>
+        </ul>
+    {% endif %}
+</div>
+{% endblock %}

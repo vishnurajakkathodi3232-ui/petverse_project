@@ -1,0 +1,28 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container" style="margin-top:150px;">
+    <h2>Edit Pet</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <label>Pet Name</label>
+        <input type="text" name="name" value="{{ pet.name }}" class="form-control" required><br>
+
+        <label>Category</label>
+        <input type="text" name="category" value="{{ pet.category }}" class="form-control" required><br>
+
+        <label>Description</label>
+        <textarea name="description" class="form-control" required>{{ pet.description }}</textarea><br>
+
+        <label>Image</label><br>
+        {% if pet.image %}
+            <img src="{{ pet.image.url }}" width="150px"><br><br>
+        {% endif %}
+        <input type="file" name="image" class="form-control"><br>
+
+        <button class="btn btn-primary" style="width:100%;">Save Changes</button>
+    </form>
+</div>
+{% endblock %}

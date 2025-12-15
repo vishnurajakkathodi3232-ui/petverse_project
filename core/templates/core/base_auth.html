@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}PetVerse{% endblock %}</title>
+
+    <!-- Basic Bootstrap only -->
+    <link rel="stylesheet" href="{% static 'core/css/bootstrap.min.css' %}">
+</head>
+
+<body style="background:#f2f2f2; padding-top:120px;">
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>

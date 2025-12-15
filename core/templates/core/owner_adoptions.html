@@ -1,0 +1,44 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container" style="margin-top:150px;">
+
+    <h2>Adoption Requests</h2>
+    <p>Here you can review adoption requests for your pets.</p>
+
+    {% if requests %}
+        <ul class="list-group">
+
+            {% for req in requests %}
+                <li class="list-group-item">
+
+                    <strong>Pet:</strong> {{ req.owned_pet.name }} <br>
+                    <strong>Adopter:</strong> {{ req.adopter.username }} <br>
+                    <strong>Message:</strong> {{ req.message }} <br>
+                    <strong>Status:</strong> {{ req.status|title }}
+
+                    <br><br>
+
+                    {% if req.status == "pending" %}
+                        <a href="{% url 'owner_approve_request' req.id %}" 
+                           class="btn btn-success btn-sm">
+                           Approve
+                        </a>
+
+                        <a href="{% url 'owner_reject_request' req.id %}" 
+                           class="btn btn-danger btn-sm">
+                           Reject
+                        </a>
+                    {% endif %}
+
+                </li>
+            {% endfor %}
+
+        </ul>
+
+    {% else %}
+        <p>No adoption requests yet.</p>
+    {% endif %}
+
+</div>
+{% endblock %}

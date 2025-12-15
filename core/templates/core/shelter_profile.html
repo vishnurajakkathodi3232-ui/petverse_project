@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container" style="margin-top:150px;">
+
+    <h2>Shelter Profile</h2>
+
+    <p><strong>Shelter Name:</strong> {{ user.first_name }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Phone:</strong> {{ user.phone }}</p>
+    <p><strong>Address:</strong> {{ user.address }}</p>
+
+    {% if user.profile_image %}
+        <p><strong>Logo:</strong></p>
+        <img src="{{ user.profile_image.url }}" width="150px">
+    {% endif %}
+
+    <hr>
+
+    <p>We will add editing options later.</p>
+
+</div>
+{% endblock %}

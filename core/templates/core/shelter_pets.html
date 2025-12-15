@@ -1,0 +1,36 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container" style="margin-top:150px;">
+
+    <h2>Manage Shelter Pets</h2>
+
+    <a href="{% url 'shelter_add_pet' %}" class="btn btn-primary">Add New Pet</a>
+
+    <hr>
+
+    {% if pets %}
+        <ul>
+            {% for pet in pets %}
+                <li>
+    <strong>{{ pet.name }}</strong> ({{ pet.category }}) <br>
+
+    {% if pet.image %}
+        <img src="{{ pet.image.url }}" width="120px"><br>
+    {% endif %}
+
+    <a href="{% url 'shelter_edit_pet' pet.id %}" class="btn btn-warning btn-sm">Edit</a>
+    <a href="{% url 'shelter_delete_pet' pet.id %}" class="btn btn-danger btn-sm"
+       onclick="return confirm('Are you sure?')">Delete</a>
+</li>
+<hr>
+
+                <hr>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No pets added yet.</p>
+    {% endif %}
+
+</div>
+{% endblock %}

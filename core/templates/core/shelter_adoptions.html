@@ -1,0 +1,28 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container" style="margin-top:150px;">
+
+    <h2>Adoption Requests</h2>
+
+    {% if requests %}
+        <ul>
+            {% for r in requests %}
+                <li>
+                    <strong>Pet:</strong> {{ r.pet.name }} <br>
+                    <strong>Adopter:</strong> {{ r.adopter.username }} <br>
+                    <strong>Message:</strong> {{ r.message }} <br>
+                    <strong>Status:</strong> {{ r.status }} <br>
+
+                    <a href="{% url 'approve_request' r.id %}" class="btn btn-success btn-sm">Approve</a>
+                    <a href="{% url 'decline_request' r.id %}" class="btn btn-danger btn-sm">Decline</a>
+                </li>
+                <hr>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No adoption requests yet.</p>
+    {% endif %}
+
+</div>
+{% endblock %}

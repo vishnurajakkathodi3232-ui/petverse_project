@@ -1,0 +1,25 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container" style="margin-top:150px;">
+    <h2>Add New Pet</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <label>Pet Name</label>
+        <input type="text" name="name" class="form-control" required><br>
+
+        <label>Category</label>
+        <input type="text" name="category" class="form-control" required><br>
+
+        <label>Description</label>
+        <textarea name="description" class="form-control" required></textarea><br>
+
+        <label>Image</label>
+        <input type="file" name="image" class="form-control" required><br>
+
+        <button class="btn btn-primary" style="width:100%;">Add Pet</button>
+    </form>
+</div>
+{% endblock %}
