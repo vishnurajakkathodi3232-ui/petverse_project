@@ -1,0 +1,43 @@
+{% extends "core/admin/base_admin.html" %}
+
+
+{% block title %}Super Admin Dashboard{% endblock %}
+
+{% block content %}
+
+<h2>Dashboard</h2>
+<p class="text-muted">System overview</p>
+
+<div class="row">
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <span>Total Users</span>
+            <h3>{{ total_users }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <span>Total Pets</span>
+            <h3>{{ total_pets }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <span>Adoption Requests</span>
+            <h3>{{ total_requests }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <span>Orders</span>
+            <h3>0</h3>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

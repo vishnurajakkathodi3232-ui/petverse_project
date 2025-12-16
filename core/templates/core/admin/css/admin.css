@@ -1,0 +1,89 @@
+body.admin-body {
+    background: #0b1220;
+    color: #e5e7eb;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* Layout */
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.admin-sidebar {
+    width: 240px;
+    background: #0f172a;
+    padding: 20px 0;
+}
+
+.admin-sidebar .brand {
+    font-size: 20px;
+    font-weight: 600;
+    padding: 0 20px 20px;
+    color: #ffffff;
+}
+
+.admin-sidebar .menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.admin-sidebar .menu li a {
+    display: block;
+    padding: 12px 20px;
+    color: #cbd5f5;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.admin-sidebar .menu li a i {
+    margin-right: 10px;
+}
+
+.admin-sidebar .menu li a:hover,
+.admin-sidebar .menu li a.active {
+    background: #1e293b;
+    color: #ffffff;
+}
+
+/* Main */
+.admin-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Topbar */
+.admin-topbar {
+    background: #0f172a;
+    padding: 12px 20px;
+    border-bottom: 1px solid #1e293b;
+}
+
+.admin-topbar .right {
+    text-align: right;
+}
+
+/* Content */
+.admin-content {
+    padding: 30px;
+}
+
+/* Cards */
+.stat-card {
+    background: #0f172a;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.stat-card h3 {
+    font-size: 26px;
+    margin: 0;
+}
+
+.stat-card span {
+    color: #94a3b8;
+}

@@ -1,0 +1,30 @@
+{% extends "core/admin/base_admin.html" %}
+{% block title %}Orders & Payments{% endblock %}
+
+{% block content %}
+<h2>Orders & Payments</h2>
+<p class="text-muted">Adoption & shop transactions</p>
+
+<div class="stat-card">
+    <table class="table table-dark">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>User</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>#0001</td>
+                <td>demo_user</td>
+                <td>Adoption</td>
+                <td><span class="label label-success">Paid</span></td>
+                <td>₹2,500</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

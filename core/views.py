@@ -608,3 +608,67 @@ def send_owner_adoption_request(request, pet_id):
         "core/send_adoption_request.html",
         {"pet": owned_pet.pet}
     )
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
+from .models import Pet, AdoptionRequest
+
+User = get_user_model()
+
+@login_required
+def superadmin_dashboard(request):
+    if not request.user.is_superuser:
+        return redirect("home")
+
+    context = {
+        "total_users": User.objects.count(),
+        "total_pets": Pet.objects.count(),
+        "total_requests": AdoptionRequest.objects.count(),
+    }
+
+    return render(
+        request,
+        "core/admin/dashboard.html",
+        context
+    )
+@login_required
+def superadmin_users(request):
+    if not request.user.is_superuser:
+        return redirect("home")
+
+    users = User.objects.all().order_by("-date_joined")
+
+    return render(
+        request,
+        "core/admin/users.html",
+        {"users": users}
+    )
+@login_required
+def superadmin_pets(request):
+    if not request.user.is_superuser:
+        return redirect("home")
+
+    pets = Pet.objects.select_related("added_by")
+
+    return render(
+        request,
+        "core/admin/pets.html",
+        {"pets": pets}
+    )
+@login_required
+def superadmin_orders(request):
+    if not request.user.is_superuser:
+        return redirect("home")
+
+    return render(
+        request,
+        "core/admin/orders.html"
+    )
+@login_required
+def superadmin_analytics(request):
+    if not request.user.is_superuser:
+        return redirect("home")
+
+    return render(
+        request,
+        "core/admin/analytics.html"
+    )

@@ -1,0 +1,203 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}PetVerse Admin{% endblock %}</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="{% static 'core/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/font-awesome.min.css' %}">
+
+    <!-- Dark Admin Styles -->
+    <style>
+        body {
+            background: #0b1020;
+            color: #e5e7eb;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* Layout */
+        .admin-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            width: 260px;
+            background: #0f172a;
+            padding: 20px;
+            border-right: 1px solid #1e293b;
+        }
+
+        .admin-logo {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #a855f7;
+        }
+
+        .admin-sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .admin-sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .admin-sidebar a {
+            display: block;
+            padding: 10px 14px;
+            border-radius: 6px;
+            color: #cbd5f5;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .admin-sidebar a i {
+            margin-right: 10px;
+        }
+
+        .admin-sidebar a:hover,
+        .admin-sidebar a.active {
+            background: #1e293b;
+            color: #ffffff;
+        }
+
+        /* Main */
+        .admin-main {
+            flex: 1;
+        }
+
+        /* Topbar */
+        .admin-topbar {
+            background: #0f172a;
+            padding: 14px 30px;
+            border-bottom: 1px solid #1e293b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-user {
+            font-size: 14px;
+        }
+
+        .admin-user a {
+            color: #a855f7;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+
+        /* Content */
+        .admin-content {
+            padding: 30px;
+        }
+
+        /* Cards */
+        .stat-card {
+            background: #111827;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #1e293b;
+            transition: 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: #9ca3af;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+<div class="admin-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="admin-logo">
+            🐾 PetVerse Admin
+        </div>
+
+        <ul>
+            <li>
+                <a href="{% url 'superadmin_dashboard' %}"
+                   class="{% if request.resolver_match.url_name == 'superadmin_dashboard' %}active{% endif %}">
+                    <i class="fa fa-dashboard"></i> Dashboard
+                </a>
+            </li>
+{% comment %} 
+            <li>
+                <a href="{% url 'admin_users' %}">
+                    <i class="fa fa-users"></i> Users
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'admin_pets' %}">
+                    <i class="fa fa-paw"></i> Pets
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'admin_adoptions' %}">
+                    <i class="fa fa-heart"></i> Adoptions
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'admin_orders' %}">
+                    <i class="fa fa-shopping-cart"></i> Orders
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'admin_payments' %}">
+                    <i class="fa fa-credit-card"></i> Payments
+                </a>
+            </li>
+        </ul>
+    </aside> {% endcomment %}
+
+    <!-- MAIN -->
+    <div class="admin-main">
+
+        <!-- TOPBAR -->
+        <div class="admin-topbar">
+            <div>System Overview</div>
+
+            <div class="admin-user">
+                {{ request.user.username }}
+                <a href="{% url 'logout' %}">Logout</a>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="admin-content">
+            {% block content %}{% endblock %}
+        </div>
+
+    </div>
+</div>
+
+<script src="{% static 'core/js/bootstrap.min.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

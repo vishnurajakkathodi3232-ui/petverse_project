@@ -57,6 +57,14 @@ urlpatterns = [
     path("owner/adoptions/approve/<int:req_id>/",views.owner_approve_request,name="owner_approve_request"),
 
     path("owner/adoptions/reject/<int:req_id>/",views.owner_reject_request,name="owner_reject_request"),
+    path("superadmin/dashboard/",views.superadmin_dashboard,name="superadmin_dashboard"),
+    path("superadmin/users/",views.superadmin_users,name="superadmin_users"),
+    path("superadmin/orders/",views.superadmin_orders,name="superadmin_orders"),
+    path("superadmin/analytics/",views.superadmin_analytics,name="superadmin_analytics"),
+
+
+
+
 
 
 
