@@ -1,36 +1,53 @@
 {% extends "core/admin/base_admin.html" %}
-{% block title %}Pets | Super Admin{% endblock %}
+
+{% block title %}Admin | Pets{% endblock %}
 
 {% block content %}
-<h2>All Pets</h2>
-<p class="text-muted">Shelter + Owner pets</p>
+<h1 class="mb-3">Pets</h1>
+<p class="text-muted mb-4">Manage all pets listed on the platform</p>
 
-<div class="stat-card">
-    <table class="table table-dark table-hover">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Available</th>
-                <th>Added By</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for pet in pets %}
-            <tr>
-                <td>{{ pet.name }}</td>
-                <td>{{ pet.category }}</td>
-                <td>
-                    {% if pet.is_available %}
-                        <span class="label label-success">Yes</span>
-                    {% else %}
-                        <span class="label label-warning">No</span>
-                    {% endif %}
-                </td>
-                <td>{{ pet.added_by.username }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<div class="card bg-dark border border-secondary">
+    <div class="card-body p-0">
+
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Pet Name</th>
+                        <th>Category</th>
+                        <th>Available for Adoption</th>
+                        <th>Added By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pet in pets %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ pet.name }}</td>
+                        <td>{{ pet.category }}</td>
+                        <td>
+                            {% if pet.is_available %}
+                                <span class="badge bg-success">Yes</span>
+                            {% else %}
+                                <span class="badge bg-secondary">No</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ pet.added_by.username|default:"N/A" }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            No pets found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
 </div>
 {% endblock %}

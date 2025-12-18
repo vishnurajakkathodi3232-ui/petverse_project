@@ -61,7 +61,20 @@ urlpatterns = [
     path("superadmin/users/",views.superadmin_users,name="superadmin_users"),
     path("superadmin/orders/",views.superadmin_orders,name="superadmin_orders"),
     path("superadmin/analytics/",views.superadmin_analytics,name="superadmin_analytics"),
-
+    path("superadmin/users/",views.superadmin_users,name="admin_users"),
+    path( "superadmin/pets/",views.superadmin_pets,name="admin_pets"),
+    path(
+    "superadmin/adoptions/",views.superadmin_adoptions,name="admin_adoptions"),
+    path(
+    "superadmin/adoptions/<int:pk>/approve/",
+    views.admin_approve_adoption,
+    name="admin_approve_adoption"
+),
+path(
+    "superadmin/adoptions/<int:pk>/reject/",
+    views.admin_reject_adoption,
+    name="admin_reject_adoption"
+),
 
 
 

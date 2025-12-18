@@ -1,0 +1,86 @@
+{% extends "core/admin/base_admin.html" %}
+
+{% block title %}Admin | Adoptions{% endblock %}
+
+{% block content %}
+<h1 class="mb-3">Adoption Requests</h1>
+<p class="text-muted mb-4">
+    Review all adoption requests across the platform
+</p>
+
+<div class="card bg-dark border border-secondary">
+    <div class="card-body p-0">
+
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Pet</th>
+                        <th>Type</th>
+                        <th>Adopter</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for adoption in adoptions %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+
+                        <td>
+                            {{ adoption.target_pet_name }}
+                        </td>
+
+                        <td>
+                            <span class="badge bg-info">
+                                {{ adoption.adoption_type }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ adoption.adopter.username }}
+                        </td>
+
+                        <td>
+                            {% if adoption.status == "pending" %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif adoption.status == "approved" %}
+                                <span class="badge bg-success">Approved</span>
+                            {% else %}
+                                <span class="badge bg-danger">Declined</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if adoption.status == "pending" %}
+                                <a href="{% url 'admin_approve_adoption' adoption.id %}"
+                                   class="btn btn-sm btn-success me-1">
+                                    Approve
+                                </a>
+
+                                <a href="{% url 'admin_reject_adoption' adoption.id %}"
+                                   class="btn btn-sm btn-danger">
+                                    Decline
+                                </a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            No adoption requests found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

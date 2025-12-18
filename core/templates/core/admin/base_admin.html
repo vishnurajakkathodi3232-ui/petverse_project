@@ -12,23 +12,26 @@
     <!-- Dark Admin Styles -->
     <style>
         body {
+            margin: 0;
             background: #0b1020;
-            color: #e5e7eb;
+            color: #c3c0c4ff;
             font-family: 'Segoe UI', sans-serif;
         }
 
-        /* Layout */
+        /* ===== Layout ===== */
         .admin-wrapper {
             display: flex;
             min-height: 100vh;
+            width: 100%;
         }
 
-        /* Sidebar */
+        /* ===== Sidebar ===== */
         .admin-sidebar {
             width: 260px;
             background: #0f172a;
             padding: 20px;
             border-right: 1px solid #1e293b;
+            flex-shrink: 0;
         }
 
         .admin-logo {
@@ -41,6 +44,7 @@
         .admin-sidebar ul {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
 
         .admin-sidebar li {
@@ -66,12 +70,15 @@
             color: #ffffff;
         }
 
-        /* Main */
+        /* ===== Main Area ===== */
         .admin-main {
+            display: flex;
+            flex-direction: column;
             flex: 1;
+            min-width: 0; /* VERY IMPORTANT */
         }
 
-        /* Topbar */
+        /* ===== Topbar ===== */
         .admin-topbar {
             background: #0f172a;
             padding: 14px 30px;
@@ -91,12 +98,14 @@
             margin-left: 10px;
         }
 
-        /* Content */
+        /* ===== Content ===== */
         .admin-content {
-            padding: 30px;
+            flex: 1;
+            padding: 24px 30px;
+            overflow-x: auto;
         }
 
-        /* Cards */
+        /* ===== Cards ===== */
         .stat-card {
             background: #111827;
             border-radius: 12px;
@@ -143,38 +152,29 @@
                     <i class="fa fa-dashboard"></i> Dashboard
                 </a>
             </li>
-{% comment %} 
+
             <li>
-                <a href="{% url 'admin_users' %}">
+                <a href="{% url 'admin_users' %}"
+                   class="{% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}">
                     <i class="fa fa-users"></i> Users
                 </a>
             </li>
-
             <li>
-                <a href="{% url 'admin_pets' %}">
+                <a href="{% url 'admin_pets' %}"
+                    class="{% if request.resolver_match.url_name == 'admin_pets' %}active{% endif %}">
                     <i class="fa fa-paw"></i> Pets
                 </a>
             </li>
-
             <li>
-                <a href="{% url 'admin_adoptions' %}">
+                <a href="{% url 'admin_adoptions' %}"
+                    class="{% if request.resolver_match.url_name == 'admin_adoptions' %}active{% endif %}">
                     <i class="fa fa-heart"></i> Adoptions
                 </a>
             </li>
 
-            <li>
-                <a href="{% url 'admin_orders' %}">
-                    <i class="fa fa-shopping-cart"></i> Orders
-                </a>
-            </li>
 
-            <li>
-                <a href="{% url 'admin_payments' %}">
-                    <i class="fa fa-credit-card"></i> Payments
-                </a>
-            </li>
         </ul>
-    </aside> {% endcomment %}
+    </aside>
 
     <!-- MAIN -->
     <div class="admin-main">
