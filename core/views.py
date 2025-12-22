@@ -17,15 +17,35 @@ User = get_user_model()
 # ======================================================
 # PUBLIC PAGES
 # ======================================================
+from itertools import chain
+from .models import Pet, OwnedPet, News
+
 
 def home(request):
-    pets = Pet.objects.filter(is_available=True)[:6]
-    news = News.objects.all()[:3]
-    return render(request, "core/home.html", {
-        "pets": pets,
-        "news": news,
-    })
+    # Shelter pets that are available
+    shelter_pets = Pet.objects.filter(is_available=True)
 
+    # Owner pets that are available (use the related Pet object)
+    owner_pets = OwnedPet.objects.filter(
+        is_available=True
+    ).select_related("pet")
+
+    # Normalize owner pets to look like Pet objects
+    owner_pet_list = [op.pet for op in owner_pets]
+
+    # Combine both sources
+    combined_pets = list(chain(shelter_pets, owner_pet_list))[:6]
+
+    news = News.objects.all()[:3]
+
+    return render(
+        request,
+        "core/home.html",
+        {
+            "pets": combined_pets,
+            "news": news,
+        }
+    )
 
 def make_appointment(request):
     if request.method == "POST":
@@ -326,13 +346,19 @@ def adopter_profile(request):
         return redirect("home")
     return render(request, "core/profile_adopter.html")
 
-
 @login_required
 def adopter_adoptions(request):
     if request.user.role != "adopter":
         return redirect("home")
 
-    requests = AdoptionRequest.objects.filter(adopter=request.user)
+    requests = AdoptionRequest.objects.filter(
+        adopter=request.user
+    ).select_related(
+        "pet",
+        "owned_pet",
+        "owned_pet__pet"
+    ).order_by("-created_at")
+
     return render(
         request,
         "core/adoptions_adopter.html",
@@ -543,3 +569,35 @@ def send_owner_adoption_request(request, pet_id):
     )
 
     return redirect("pets_list")
+@login_required
+def shelter_mark_available(request, pet_id):
+    if request.user.role != "shelter":
+        return redirect("home")
+
+    pet = get_object_or_404(
+        Pet,
+        id=pet_id,
+        added_by=request.user
+    )
+
+    pet.is_available = True
+    pet.save()
+
+    return redirect("shelter_pets")
+
+
+@login_required
+def shelter_mark_unavailable(request, pet_id):
+    if request.user.role != "shelter":
+        return redirect("home")
+
+    pet = get_object_or_404(
+        Pet,
+        id=pet_id,
+        added_by=request.user
+    )
+
+    pet.is_available = False
+    pet.save()
+
+    return redirect("shelter_pets")

@@ -3,16 +3,16 @@
 {% block title %}Shelter Pets | PetVerse{% endblock %}
 
 {% block content %}
-<h2>Manage Shelter Pets 🐾</h2>
-<p>Pets added by your shelter for adoption.</p>
+<h2 class="mb-3">Manage Shelter Pets 🐾</h2>
+<p class="text-muted">
+    Control your shelter pets and their adoption availability.
+</p>
 
 <hr>
 
-<a href="{% url 'shelter_add_pet' %}" class="btn btn-primary">
+<a href="{% url 'shelter_add_pet' %}" class="btn btn-primary mb-3">
     <i class="fa fa-plus-circle"></i> Add New Pet
 </a>
-
-<hr>
 
 {% if pets %}
 <div class="row">
@@ -25,16 +25,40 @@
                 {% if pet.image %}
                     <img src="{{ pet.image.url }}"
                          class="img-responsive"
-                         style="margin: 0 auto 10px; max-height: 160px;">
+                         style="margin:0 auto 10px; max-height:160px;">
                 {% endif %}
 
                 <h4>{{ pet.name }}</h4>
                 <p class="text-muted">{{ pet.category }}</p>
 
+                {% if pet.is_available %}
+                    <span class="label label-success">
+                        Available for Adoption
+                    </span>
+                {% else %}
+                    <span class="label label-default">
+                        Not Available
+                    </span>
+                {% endif %}
+
+                <hr>
+
+                {% if pet.is_available %}
+                    <a href="{% url 'shelter_mark_unavailable' pet.id %}"
+                       class="btn btn-warning btn-sm">
+                        Remove from Adoption
+                    </a>
+                {% else %}
+                    <a href="{% url 'shelter_mark_available' pet.id %}"
+                       class="btn btn-success btn-sm">
+                        List for Adoption
+                    </a>
+                {% endif %}
+
                 <hr>
 
                 <a href="{% url 'shelter_edit_pet' pet.id %}"
-                   class="btn btn-warning btn-sm">
+                   class="btn btn-info btn-sm">
                     <i class="fa fa-edit"></i> Edit
                 </a>
 

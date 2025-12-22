@@ -3,22 +3,38 @@
 {% block title %}PetVerse - Home{% endblock %}
 
 {% block content %}
+
 <!-- PET SECTION (dynamic) -->
 <section id="team">
     <div class="container">
         <div class="row">
+
             {% for pet in pets %}
             <div class="col-md-4 col-sm-6">
                 <div class="team-thumb">
-                    <img src="{{ pet.image.url }}" class="img-responsive" alt="">
+
+                    {% if pet.image %}
+                        <img src="{{ pet.image.url }}"
+                             class="img-responsive"
+                             alt="{{ pet.name }}">
+                    {% endif %}
+
                     <div class="team-info">
                         <h3>{{ pet.name }}</h3>
                         <p>{{ pet.category }}</p>
                         <p>{{ pet.description|truncatewords:15 }}</p>
                     </div>
+
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    No pets are currently available.
                 </div>
             </div>
             {% endfor %}
+
         </div>
     </div>
 </section>
@@ -27,19 +43,35 @@
 <section id="news">
     <div class="container">
         <div class="row">
+
             {% for item in news %}
             <div class="col-md-4 col-sm-6">
                 <div class="news-thumb">
-                    <img src="{{ item.image.url }}" class="img-responsive" alt="">
+
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}"
+                             class="img-responsive"
+                             alt="{{ item.title }}">
+                    {% endif %}
+
                     <div class="news-info">
                         <span>{{ item.created_at }}</span>
                         <h3>{{ item.title }}</h3>
                         <p>{{ item.content|truncatewords:15 }}</p>
                     </div>
+
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    No news available at the moment.
                 </div>
             </div>
             {% endfor %}
+
         </div>
     </div>
 </section>
+
 {% endblock %}

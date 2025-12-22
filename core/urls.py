@@ -11,6 +11,7 @@ urlpatterns = [
     path("logout/", views.user_logout, name="logout"),
     path("pets/", views.pets_list, name="pets_list"),
     path("pet/<int:pet_id>/", views.pet_detail, name="pet_detail"),
+    
 
     # -------------------- ADOPTER ROUTES --------------------
     path("adopter/dashboard/", views.adopter_dashboard, name="adopter_dashboard"),
@@ -43,6 +44,9 @@ urlpatterns = [
     path("shelter/pets/add/", views.shelter_add_pet, name="shelter_add_pet"),
     path("shelter/pets/edit/<int:pet_id>/", views.shelter_edit_pet, name="shelter_edit_pet"),
     path("shelter/pets/delete/<int:pet_id>/", views.shelter_delete_pet, name="shelter_delete_pet"),
+    path("shelter/pets/list/<int:pet_id>/",views.shelter_mark_available,name="shelter_mark_available"),
+
+    path("shelter/pets/unlist/<int:pet_id>/",views.shelter_mark_unavailable,name="shelter_mark_unavailable"),
 
     # Shelter adoption actions
     path("shelter/adoptions/", views.shelter_adoptions, name="shelter_adoptions"),
@@ -63,23 +67,8 @@ urlpatterns = [
     path("superadmin/analytics/",views.superadmin_analytics,name="superadmin_analytics"),
     path("superadmin/users/",views.superadmin_users,name="admin_users"),
     path( "superadmin/pets/",views.superadmin_pets,name="admin_pets"),
-    path(
-    "superadmin/adoptions/",views.superadmin_adoptions,name="admin_adoptions"),
-    path(
-    "superadmin/adoptions/<int:pk>/approve/",
-    views.admin_approve_adoption,
-    name="admin_approve_adoption"
-),
-path(
-    "superadmin/adoptions/<int:pk>/reject/",
-    views.admin_reject_adoption,
-    name="admin_reject_adoption"
-),
-
-
-
-
-
-
+    path("superadmin/adoptions/",views.superadmin_adoptions,name="admin_adoptions"),
+    path("superadmin/adoptions/<int:pk>/approve/",views.admin_approve_adoption,name="admin_approve_adoption"),
+    path("superadmin/adoptions/<int:pk>/reject/",views.admin_reject_adoption,name="admin_reject_adoption"),
 
 ]

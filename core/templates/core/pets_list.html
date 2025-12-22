@@ -5,7 +5,9 @@
 {% block content %}
 
 <h2 class="mb-3">Available Pets 🐾</h2>
-<p class="text-muted">Browse pets available for adoption.</p>
+<p class="text-muted">
+    Browse pets that are currently available for adoption.
+</p>
 
 <hr>
 
@@ -33,15 +35,31 @@
 
                 <br><br>
 
+                <!-- VIEW DETAILS -->
                 {% if pet.source == "shelter" %}
                     <a href="{% url 'pet_detail' pet.id %}"
-                       class="btn btn-primary btn-sm">
+                       class="btn btn-default btn-sm">
                         View Details
                     </a>
                 {% else %}
                     <a href="{% url 'owned_pet_detail' pet.id %}"
-                       class="btn btn-primary btn-sm">
+                       class="btn btn-default btn-sm">
                         View Details
+                    </a>
+                {% endif %}
+
+                <br><br>
+
+                <!-- ADOPT ACTION -->
+                {% if pet.source == "shelter" %}
+                    <a href="{% url 'send_adoption_request' pet.id %}"
+                       class="btn btn-primary btn-sm">
+                        Adopt
+                    </a>
+                {% else %}
+                    <a href="{% url 'send_owner_adoption_request' pet.id %}"
+                       class="btn btn-primary btn-sm">
+                        Adopt
                     </a>
                 {% endif %}
             </div>

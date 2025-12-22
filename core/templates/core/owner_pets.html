@@ -5,7 +5,9 @@
 {% block content %}
 
 <h2 class="mb-3">My Pets 🐾</h2>
-<p class="text-muted">Manage your pets and their adoption status.</p>
+<p class="text-muted">
+    Manage your pets and control whether they are available for adoption.
+</p>
 
 <hr>
 
@@ -26,15 +28,19 @@
                 <h4>{{ pet.pet.name }}</h4>
                 <p class="text-muted">{{ pet.pet.category }}</p>
 
-                {% if pet.is_listed_for_adoption %}
-                    <span class="label label-success">Listed for Adoption</span>
+                {% if pet.is_available %}
+                    <span class="label label-success">
+                        Available for Adoption
+                    </span>
                 {% else %}
-                    <span class="label label-default">Private</span>
+                    <span class="label label-default">
+                        Not Available
+                    </span>
                 {% endif %}
 
                 <hr>
 
-                {% if pet.is_listed_for_adoption %}
+                {% if pet.is_available %}
                     <a href="{% url 'owner_unlist_pet' pet.id %}"
                        class="btn btn-warning btn-sm">
                         Remove from Adoption
@@ -42,7 +48,7 @@
                 {% else %}
                     <a href="{% url 'owner_list_pet' pet.id %}"
                        class="btn btn-success btn-sm">
-                        Mark for Adoption
+                        List for Adoption
                     </a>
                 {% endif %}
 
@@ -54,7 +60,7 @@
 </div>
 {% else %}
 <div class="alert alert-info">
-    You haven't added any pets yet.
+    You haven’t added any pets yet.
 </div>
 {% endif %}
 
