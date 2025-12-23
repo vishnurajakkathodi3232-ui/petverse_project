@@ -20,32 +20,29 @@ User = get_user_model()
 from itertools import chain
 from .models import Pet, OwnedPet, News
 
+from itertools import chain
 
 def home(request):
     # Shelter pets that are available
     shelter_pets = Pet.objects.filter(is_available=True)
 
-    # Owner pets that are available (use the related Pet object)
+    # Owner pets that are listed for adoption
     owner_pets = OwnedPet.objects.filter(
-        is_available=True
+        is_listed_for_adoption=True
     ).select_related("pet")
 
-    # Normalize owner pets to look like Pet objects
-    owner_pet_list = [op.pet for op in owner_pets]
+    # Normalize owner pets to Pet-like objects
+    owner_pet_objects = [op.pet for op in owner_pets]
 
-    # Combine both sources
-    combined_pets = list(chain(shelter_pets, owner_pet_list))[:6]
+    # Combine both
+    pets = list(chain(shelter_pets, owner_pet_objects))[:6]
 
     news = News.objects.all()[:3]
 
-    return render(
-        request,
-        "core/home.html",
-        {
-            "pets": combined_pets,
-            "news": news,
-        }
-    )
+    return render(request, "core/home.html", {
+        "pets": pets,
+        "news": news,
+    })
 
 def make_appointment(request):
     if request.method == "POST":
@@ -94,7 +91,7 @@ def user_login(request):
         )
         if user:
             login(request, user)
-            return redirect("home")
+            return redirect("dashboard")
 
         return render(request, "core/login.html", {"error": "Invalid credentials"})
 
@@ -191,6 +188,7 @@ def owner_pets(request):
     return render(request, "core/owner_pets.html", {"pets": pets})
 
 
+
 @login_required
 def owner_list_pet(request, pet_id):
     owned_pet = get_object_or_404(
@@ -198,11 +196,11 @@ def owner_list_pet(request, pet_id):
         id=pet_id,
         owner=request.user
     )
-    owned_pet.is_available = True
+
+    owned_pet.is_listed_for_adoption = True
     owned_pet.save()
+
     return redirect("owner_pets")
-
-
 @login_required
 def owner_unlist_pet(request, pet_id):
     owned_pet = get_object_or_404(
@@ -210,8 +208,10 @@ def owner_unlist_pet(request, pet_id):
         id=pet_id,
         owner=request.user
     )
-    owned_pet.is_available = False
+
+    owned_pet.is_listed_for_adoption = False
     owned_pet.save()
+
     return redirect("owner_pets")
 
 
@@ -376,15 +376,33 @@ def adopter_appointments(request):
 # ---------- OWNER ----------
 @login_required
 def owner_add_pet(request):
+    if not getattr(request.user, "has_pet", False):
+        return redirect("home")
+
     if request.method == "POST":
-        Pet.objects.create(
-            name=request.POST.get("name"),
-            category=request.POST.get("category"),
-            description=request.POST.get("description", ""),
-            image=request.FILES.get("image"),
-            added_by=request.user,
-            is_available=False,
+        name = request.POST.get("name")
+        pet_type = (
+            request.POST.get("pet_type")
+            or request.POST.get("category")
+            or "Unknown"
         )
+        image = request.FILES.get("image")
+        description = request.POST.get("description", "Owner added pet")
+
+        pet = Pet.objects.create(
+            name=name,
+            category=pet_type,
+            description=description,
+            image=image,
+            is_available=False,
+            added_by=request.user
+        )
+
+        OwnedPet.objects.create(
+            owner=request.user,
+            pet=pet
+        )
+
         return redirect("owner_pets")
 
     return render(request, "core/owner_add_pet.html")
@@ -601,3 +619,29 @@ def shelter_mark_unavailable(request, pet_id):
     pet.save()
 
     return redirect("shelter_pets")
+from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+
+
+@login_required
+def dashboard_redirect(request):
+    user = request.user
+
+    # Super Admin
+    if user.is_superuser:
+        return redirect("superadmin_dashboard")
+
+    # Shelter
+    if getattr(user, "role", None) == "shelter":
+        return redirect("shelter_dashboard")
+
+    # Owner
+    if getattr(user, "role", None) == "owner" or getattr(user, "has_pet", False):
+        return redirect("owner_dashboard")
+
+    # Adopter
+    if getattr(user, "role", None) == "adopter":
+        return redirect("adopter_dashboard")
+
+    # Fallback
+    return redirect("home")

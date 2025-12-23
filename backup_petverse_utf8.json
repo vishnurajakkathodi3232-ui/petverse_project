@@ -1,0 +1,156 @@
+[
+{
+  "model": "sessions.session",
+  "pk": "be4iy5otmue6468m8j4gpc17dsxkelyv",
+  "fields": {
+    "session_data": ".eJxVjMsKwyAQAP9lz0U0vtgce-83yOpqTVsUYnIq_fcSyKG9zgzzhkD7VsM-8hoWhhk0XH5ZpPTM7RD8oHbvIvW2rUsURyJOO8Stc35dz_ZvUGlUmMHKSTFF4xSyisYmwuxlZhu9o6IQdbLJFGei1GQcmknrwohZW2-TQvh8Ad8LN3s:1vXuog:EiU5_-2-v8s2UGpMHytf1Pvl-nCB17r5N7ka_AVnFAs",
+    "expire_date": "2026-01-06T05:20:14.107Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "rr8680vilwnu6q4z3aqwt2pie4yhj77v",
+  "fields": {
+    "session_data": "e30:1vXuls:F_kHlkE214Dzvn5gX11GXYiU-CmnxzTUzu2286D-tFE",
+    "expire_date": "2026-01-06T05:17:20.335Z"
+  }
+},
+{
+  "model": "core.pet",
+  "pk": 1,
+  "fields": {
+    "name": "Lexi",
+    "category": "Dog",
+    "description": "Owner provided pet",
+    "image": "pets/pet2.jpg",
+    "is_available": false,
+    "added_by": 2
+  }
+},
+{
+  "model": "core.pet",
+  "pk": 2,
+  "fields": {
+    "name": "ANGEL",
+    "category": "pomeranian",
+    "description": "friendly",
+    "image": "pets/angel_pomeranian_kxJdWMv.jpg",
+    "is_available": false,
+    "added_by": 4
+  }
+},
+{
+  "model": "core.ownedpet",
+  "pk": 1,
+  "fields": {
+    "owner": 2,
+    "pet": 1,
+    "acquired_at": "2025-12-12T06:44:00.058Z",
+    "is_available": false
+  }
+},
+{
+  "model": "core.adoptionrequest",
+  "pk": 1,
+  "fields": {
+    "adopter": 3,
+    "pet": 2,
+    "owned_pet": null,
+    "message": "uhhbhux",
+    "status": "declined",
+    "created_at": "2025-12-15T15:53:23.470Z"
+  }
+},
+{
+  "model": "accounts.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$ry8EjkqXqlPGGYqCJRHlV3$G0qW1jDNYMSQ0hz5DaQIDRXuRibrqtufvM+2MLZh5HY=",
+    "last_login": "2025-12-18T06:02:57.664Z",
+    "is_superuser": true,
+    "username": "petverse_vishnu",
+    "first_name": "",
+    "last_name": "",
+    "email": "batisduta32@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-12-12T06:42:30.639Z",
+    "role": "adopter",
+    "phone": "",
+    "address": "",
+    "profile_image": "",
+    "has_pet": false,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$fV2tY8q7dxyLALtilqZIeO$e8+WAVdlFJw+VjREEyNj0LuHpcYHI7Jxoifc3CgapvI=",
+    "last_login": "2025-12-23T05:19:55.333Z",
+    "is_superuser": false,
+    "username": "test_owner",
+    "first_name": "test_owner",
+    "last_name": "",
+    "email": "test_owner@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-12-12T06:43:59.265Z",
+    "role": "owner",
+    "phone": "7510000081",
+    "address": "Palakkad,Kerala ,India",
+    "profile_image": "",
+    "has_pet": true,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$EjEt07llaolny0LhbfJWIh$xSfWUfT9XQcgStF2f1bxrz2AtZG/hL71dFi7eHGMuRM=",
+    "last_login": "2025-12-23T05:20:14.092Z",
+    "is_superuser": false,
+    "username": "test_adopter",
+    "first_name": "test_adopter",
+    "last_name": "",
+    "email": "test_adopter@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-12-12T13:17:50.690Z",
+    "role": "adopter",
+    "phone": "7987685755",
+    "address": "Palakkad,Kerala ,India",
+    "profile_image": "",
+    "has_pet": false,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.user",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$hWx5hNaD4fFWF1TYxsqYl7$YndJmFGaLnnnayOOEJMtPaJUVJ19Wk7z8NK23inkWec=",
+    "last_login": "2025-12-23T05:19:41.990Z",
+    "is_superuser": false,
+    "username": "test_shelter",
+    "first_name": "test_shelter",
+    "last_name": "",
+    "email": "test_shelter@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-12-12T13:19:21.992Z",
+    "role": "shelter",
+    "phone": "8796756744",
+    "address": "Palakkad,Kerala ,India",
+    "profile_image": "profiles/spiderman1.jpg",
+    "has_pet": false,
+    "groups": [],
+    "user_permissions": []
+  }
+}
+]

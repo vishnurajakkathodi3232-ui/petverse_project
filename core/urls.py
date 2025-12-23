@@ -5,6 +5,8 @@ urlpatterns = [
 
     # -------------------- PUBLIC ROUTES --------------------
     path("", views.home, name="home"),
+    path("dashboard/", views.dashboard_redirect, name="dashboard"),
+
     path("appointment/", views.make_appointment, name="appointment"),
     path("signup/", views.signup, name="signup"),
     path("login/", views.user_login, name="login"),

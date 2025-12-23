@@ -8,12 +8,11 @@ from django.core.exceptions import ValidationError
 # =========================
 class Pet(models.Model):
     name = models.CharField(max_length=100)
-    category = models.CharField(max_length=100)   # Dog, Cat, etc.
+    category = models.CharField(max_length=100)
     description = models.TextField()
     image = models.ImageField(upload_to='pets/')
     is_available = models.BooleanField(default=False)
 
-    # Shelter user who added the pet
     added_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -56,7 +55,7 @@ class Appointment(models.Model):
 
 
 # =========================
-# OWNED PET (Owner-listed Pet)
+# OWNED PET (Owner Pet)
 # =========================
 class OwnedPet(models.Model):
     owner = models.ForeignKey(
@@ -73,8 +72,8 @@ class OwnedPet(models.Model):
 
     acquired_at = models.DateTimeField(auto_now_add=True)
 
-    # NORMALIZED FIELD
-    is_available = models.BooleanField(default=False)
+    # Owner controls adoption visibility
+    is_listed_for_adoption = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.pet.name} owned by {self.owner.username}"
@@ -120,16 +119,13 @@ class AdoptionRequest(models.Model):
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default='pending'
+        default="pending"
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     # ---------- VALIDATION ----------
     def clean(self):
-        """
-        Exactly ONE of (pet, owned_pet) must be set.
-        """
         if not self.pet and not self.owned_pet:
             raise ValidationError(
                 "Either pet or owned_pet must be selected."
@@ -139,10 +135,6 @@ class AdoptionRequest(models.Model):
             raise ValidationError(
                 "Only one of pet or owned_pet can be selected."
             )
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
 
     # ---------- HELPERS ----------
     @property
