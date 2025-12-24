@@ -19,7 +19,7 @@ User = get_user_model()
 # ======================================================
 from itertools import chain
 from .models import Pet, OwnedPet, News
-
+from .models import Service
 from itertools import chain
 
 def home(request):
@@ -38,22 +38,73 @@ def home(request):
     pets = list(chain(shelter_pets, owner_pet_objects))[:6]
 
     news = News.objects.all()[:3]
+    services = Service.objects.filter(is_active=True)
 
     return render(request, "core/home.html", {
         "pets": pets,
         "news": news,
+        "services": services, 
     })
+from django.contrib.auth.decorators import login_required
+from .models import Appointment, ServiceAppointment, Service, OwnedPet
+
 
 def make_appointment(request):
-    if request.method == "POST":
-        Appointment.objects.create(
-            name=request.POST.get("name"),
-            email=request.POST.get("email"),
-            date=request.POST.get("date"),
-            service=request.POST.get("service"),
-            phone=request.POST.get("phone"),
-            message=request.POST.get("message"),
+    if request.method != "POST":
+        return redirect("home")
+
+    # -------------------------------
+    # CASE 1: Logged-in user (Service Booking)
+    # -------------------------------
+    if request.user.is_authenticated:
+
+        # Only adopters & owners can book services
+        if request.user.role not in ["adopter", "owner"]:
+            return redirect("home")
+
+        pet_id = request.POST.get("pet_id")
+        service_id = request.POST.get("service_id")
+        date = request.POST.get("date")
+        time = request.POST.get("time")
+        notes = request.POST.get("message")
+
+        owned_pet = OwnedPet.objects.filter(
+            id=pet_id,
+            owner=request.user
+        ).first()
+
+        service = Service.objects.filter(
+            id=service_id,
+            is_active=True
+        ).first()
+
+        if not owned_pet or not service:
+            # Fallback to home if tampered / invalid
+            return redirect("home")
+
+        ServiceAppointment.objects.create(
+            user=request.user,
+            owned_pet=owned_pet,
+            service=service,
+            appointment_date=date,
+            appointment_time=time,
+            notes=notes or "",
         )
+
+        return redirect("home")
+
+    # -------------------------------
+    # CASE 2: Public Appointment (old behavior)
+    # -------------------------------
+    Appointment.objects.create(
+        name=request.POST.get("name"),
+        email=request.POST.get("email"),
+        date=request.POST.get("date"),
+        service=request.POST.get("service"),
+        phone=request.POST.get("phone"),
+        message=request.POST.get("message"),
+    )
+
     return redirect("home")
 
 
@@ -113,19 +164,21 @@ def adopter_dashboard(request):
         return redirect("home")
     return render(request, "core/dashboard_adopter.html")
 
-
 @login_required
 def pets_list(request):
     if request.user.role != "adopter":
         return redirect("home")
 
     shelter_pets = Pet.objects.filter(is_available=True)
-    owner_pets = OwnedPet.objects.filter(is_available=True)
 
-    pets = []
+    owner_pets = OwnedPet.objects.filter(
+        is_listed_for_adoption=True
+    ).select_related("pet")
+
+    combined = []
 
     for pet in shelter_pets:
-        pets.append({
+        combined.append({
             "id": pet.id,
             "name": pet.name,
             "category": pet.category,
@@ -134,7 +187,7 @@ def pets_list(request):
         })
 
     for owned in owner_pets:
-        pets.append({
+        combined.append({
             "id": owned.id,
             "name": owned.pet.name,
             "category": owned.pet.category,
@@ -142,34 +195,56 @@ def pets_list(request):
             "source": "owner",
         })
 
-    return render(request, "core/pets_list.html", {"pets": pets})
-
+    return render(
+        request,
+        "core/pets_list.html",
+        {"pets": combined}
+    )
 
 @login_required
-def send_adoption_request(request, pet_id=None, owned_pet_id=None):
+def send_adoption_request(request, pet_id):
+    # Only adopters can send adoption requests
     if request.user.role != "adopter":
         return redirect("home")
 
-    if pet_id:
-        pet = get_object_or_404(Pet, id=pet_id, is_available=True)
-        AdoptionRequest.objects.get_or_create(
+    # Shelter pet must be AVAILABLE
+    pet = get_object_or_404(
+        Pet,
+        id=pet_id,
+        is_available=True
+    )
+
+    # Prevent duplicate requests
+    if AdoptionRequest.objects.filter(
+        adopter=request.user,
+        pet=pet
+    ).exists():
+        return render(
+            request,
+            "core/request_status.html",
+            {"message": "You have already requested this pet."}
+        )
+
+    if request.method == "POST":
+        message = request.POST.get("message")
+
+        AdoptionRequest.objects.create(
             adopter=request.user,
             pet=pet,
+            message=message
         )
 
-    if owned_pet_id:
-        owned_pet = get_object_or_404(
-            OwnedPet,
-            id=owned_pet_id,
-            is_available=True
-        )
-        AdoptionRequest.objects.get_or_create(
-            adopter=request.user,
-            owned_pet=owned_pet,
+        return render(
+            request,
+            "core/request_status.html",
+            {"message": "Adoption request sent successfully!"}
         )
 
-    return redirect("pets_list")
-
+    return render(
+        request,
+        "core/send_adoption_request.html",
+        {"pet": pet}
+    )
 
 # ======================================================
 # OWNER
@@ -188,7 +263,6 @@ def owner_pets(request):
     return render(request, "core/owner_pets.html", {"pets": pets})
 
 
-
 @login_required
 def owner_list_pet(request, pet_id):
     owned_pet = get_object_or_404(
@@ -196,11 +270,11 @@ def owner_list_pet(request, pet_id):
         id=pet_id,
         owner=request.user
     )
-
     owned_pet.is_listed_for_adoption = True
     owned_pet.save()
-
     return redirect("owner_pets")
+
+
 @login_required
 def owner_unlist_pet(request, pet_id):
     owned_pet = get_object_or_404(
@@ -208,10 +282,8 @@ def owner_unlist_pet(request, pet_id):
         id=pet_id,
         owner=request.user
     )
-
     owned_pet.is_listed_for_adoption = False
     owned_pet.save()
-
     return redirect("owner_pets")
 
 
@@ -568,25 +640,48 @@ def adopter_favorites(request):
     return render(request, "core/favorites_adopter.html")
 @login_required
 def send_owner_adoption_request(request, pet_id):
-    """
-    Wrapper to support existing URL:
-    /adopt/owner/<pet_id>/
-    """
+    # Only adopters can send requests
     if request.user.role != "adopter":
         return redirect("home")
 
     owned_pet = get_object_or_404(
         OwnedPet,
         id=pet_id,
-        is_available=True
+        is_listed_for_adoption=True
     )
 
-    AdoptionRequest.objects.get_or_create(
+    # Prevent duplicate requests
+    if AdoptionRequest.objects.filter(
         adopter=request.user,
         owned_pet=owned_pet
+    ).exists():
+        return render(
+            request,
+            "core/request_status.html",
+            {"message": "You already requested this pet."}
+        )
+
+    if request.method == "POST":
+        message = request.POST.get("message")
+
+        AdoptionRequest.objects.create(
+            adopter=request.user,
+            owned_pet=owned_pet,
+            message=message
+        )
+
+        return render(
+            request,
+            "core/request_status.html",
+            {"message": "Adoption request sent successfully!"}
+        )
+
+    return render(
+        request,
+        "core/send_adoption_request.html",
+        {"pet": owned_pet.pet}
     )
 
-    return redirect("pets_list")
 @login_required
 def shelter_mark_available(request, pet_id):
     if request.user.role != "shelter":
@@ -645,3 +740,20 @@ def dashboard_redirect(request):
 
     # Fallback
     return redirect("home")
+from .models import ServiceAppointment
+
+
+@login_required
+def my_service_appointments(request):
+    appointments = ServiceAppointment.objects.filter(
+        user=request.user
+    ).select_related(
+        "owned_pet__pet",
+        "service"
+    ).order_by("-created_at")
+
+    return render(
+        request,
+        "core/my_service_appointments.html",
+        {"appointments": appointments}
+    )

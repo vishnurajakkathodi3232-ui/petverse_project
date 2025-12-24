@@ -1,0 +1,46 @@
+{% extends "core/base_inner.html" %}
+
+{% block title %}My Service Appointments{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">My Service Appointments 🐾</h2>
+<p class="text-muted">Your grooming and vet service bookings.</p>
+
+<hr>
+
+{% if appointments %}
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Pet</th>
+                <th>Service</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appt in appointments %}
+            <tr>
+                <td>{{ appt.owned_pet.pet.name }}</td>
+                <td>{{ appt.service.name }}</td>
+                <td>{{ appt.appointment_date }}</td>
+                <td>{{ appt.appointment_time }}</td>
+                <td>
+                    <span class="label label-info">
+                        {{ appt.get_status_display }}
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    You have no service appointments yet.
+</div>
+{% endif %}
+
+{% endblock %}

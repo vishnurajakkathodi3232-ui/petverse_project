@@ -151,3 +151,92 @@ class AdoptionRequest(models.Model):
 
     def __str__(self):
         return f"{self.adopter.username} → {self.target_pet_name}"
+# =========================
+# SERVICE CATEGORY
+# =========================
+class ServiceCategory(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+
+
+# =========================
+# SERVICE (Grooming / Vet)
+# =========================
+class Service(models.Model):
+    category = models.ForeignKey(
+        ServiceCategory,
+        on_delete=models.CASCADE,
+        related_name="services"
+    )
+
+    name = models.CharField(max_length=150)
+    description = models.TextField(blank=True)
+
+    price = models.DecimalField(
+        max_digits=8,
+        decimal_places=2
+    )
+
+    duration_minutes = models.PositiveIntegerField(
+        help_text="Duration of service in minutes"
+    )
+
+    is_active = models.BooleanField(default=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.category.name})"
+# =========================
+# SERVICE APPOINTMENT (Grooming / Vet Booking)
+# =========================
+class ServiceAppointment(models.Model):
+
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("confirmed", "Confirmed"),
+        ("completed", "Completed"),
+        ("cancelled", "Cancelled"),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="service_appointments"
+    )
+
+    owned_pet = models.ForeignKey(
+        OwnedPet,
+        on_delete=models.CASCADE,
+        related_name="service_appointments"
+    )
+
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.CASCADE,
+        related_name="appointments"
+    )
+
+    appointment_date = models.DateField()
+    appointment_time = models.TimeField()
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending"
+    )
+
+    notes = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return (
+            f"{self.service.name} | "
+            f"{self.owned_pet.pet.name} | "
+            f"{self.appointment_date}"
+        )

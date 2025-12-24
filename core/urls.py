@@ -72,5 +72,7 @@ urlpatterns = [
     path("superadmin/adoptions/",views.superadmin_adoptions,name="admin_adoptions"),
     path("superadmin/adoptions/<int:pk>/approve/",views.admin_approve_adoption,name="admin_approve_adoption"),
     path("superadmin/adoptions/<int:pk>/reject/",views.admin_reject_adoption,name="admin_reject_adoption"),
+    path("my-services/",views.my_service_appointments,name="my_service_appointments"),
+
 
 ]
