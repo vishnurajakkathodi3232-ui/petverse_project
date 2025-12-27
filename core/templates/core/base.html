@@ -162,53 +162,54 @@
                         <h2>Make an Appointment</h2>
                     </div>
 
-                    {% if user.is_authenticated and user.role == "adopter" or user.role == "owner" %}
+                    {% if user.is_authenticated and user.role in "adopter owner" %}
 
-                        <!-- Pet selection -->
-                        <select class="form-control" name="pet_id" required>
-                            <option value="">Select Your Pet</option>
-                            {% for owned in user.owned_pets.all %}
-                                <option value="{{ owned.id }}">
-                                    {{ owned.pet.name }}
-                                </option>
-                            {% endfor %}
-                        </select>
+    <!-- Pet selection -->
+    <select class="form-control" name="pet_id" required>
+        <option value="">Select Your Pet</option>
+        {% for owned_pet in pets %}
+            <option value="{{ owned_pet.id }}">
+                {{ owned_pet.pet.name }}
+            </option>
+        {% endfor %}
+    </select>
 
-                        <!-- Service selection -->
-                        <select class="form-control" name="service_id" required>
-                            <option value="">Select Service</option>
-                            {% for service in services %}
-                                <option value="{{ service.id }}">
-                                    {{ service.name }} (₹{{ service.price }})
-                                </option>
-                            {% endfor %}
-                        </select>
+    <!-- Service selection -->
+    <select class="form-control" name="service_id" required>
+        <option value="">Select Service</option>
+        {% for service in services %}
+            <option value="{{ service.id }}">
+                {{ service.name }} (₹{{ service.price }})
+            </option>
+        {% endfor %}
+    </select>
 
-                        <!-- Date -->
-                        <input type="date" class="form-control" name="date" required>
+    <!-- Date -->
+    <input type="date" class="form-control" name="date" required>
 
-                        <!-- Time -->
-                        <input type="time" class="form-control" name="time" required>
+    <!-- Time -->
+    <input type="time" class="form-control" name="time" required>
 
-                        <!-- Notes -->
-                        <textarea class="form-control" name="message" rows="5"
-                                  placeholder="Additional notes (optional)"></textarea>
+    <!-- Notes -->
+    <textarea class="form-control" name="message" rows="5"
+              placeholder="Additional notes (optional)"></textarea>
 
-                    {% else %}
+{% else %}
 
-                        <!-- Public appointment -->
-                        <input type="text" class="form-control" name="name"
-                               placeholder="Full Name" required>
+    <!-- Public appointment -->
+    <input type="text" class="form-control" name="name"
+           placeholder="Full Name" required>
 
-                        <input type="email" class="form-control" name="email"
-                               placeholder="Email" required>
+    <input type="email" class="form-control" name="email"
+           placeholder="Email" required>
 
-                        <input type="date" class="form-control" name="date" required>
+    <input type="date" class="form-control" name="date" required>
 
-                        <textarea class="form-control" name="message" rows="5"
-                                  placeholder="Message"></textarea>
+    <textarea class="form-control" name="message" rows="5"
+              placeholder="Message"></textarea>
 
-                    {% endif %}
+{% endif %}
+
 
                     <button type="submit" class="form-control">Submit</button>
                 </form>

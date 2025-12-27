@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'pets',
     'adoptions',
     'services',
+    'shop',
 ]
 
 

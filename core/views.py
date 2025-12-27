@@ -21,81 +21,87 @@ from itertools import chain
 from .models import Pet, OwnedPet, News
 from .models import Service
 from itertools import chain
-
+from .models import OwnedPet, Service
 def home(request):
-    # Shelter pets that are available
-    shelter_pets = Pet.objects.filter(is_available=True)
-
-    # Owner pets that are listed for adoption
-    owner_pets = OwnedPet.objects.filter(
-        is_listed_for_adoption=True
-    ).select_related("pet")
-
-    # Normalize owner pets to Pet-like objects
-    owner_pet_objects = [op.pet for op in owner_pets]
-
-    # Combine both
-    pets = list(chain(shelter_pets, owner_pet_objects))[:6]
-
+    pets = Pet.objects.filter(is_available=True)[:6]
     news = News.objects.all()[:3]
+
+    owned_pets = []
     services = Service.objects.filter(is_active=True)
+
+    if request.user.is_authenticated:
+        owned_pets = OwnedPet.objects.filter(owner=request.user)
 
     return render(request, "core/home.html", {
         "pets": pets,
         "news": news,
-        "services": services, 
+        "owned_pets": owned_pets,
+        "services": services,
     })
-from django.contrib.auth.decorators import login_required
+
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages
 from .models import Appointment, ServiceAppointment, Service, OwnedPet
+from .models import OwnedPet, AdoptionRequest, Service
 
 
 def make_appointment(request):
     if request.method != "POST":
         return redirect("home")
 
-    # -------------------------------
-    # CASE 1: Logged-in user (Service Booking)
-    # -------------------------------
+    # ==================================================
+    # CASE 1: Logged-in user → Service Appointment
+    # ==================================================
     if request.user.is_authenticated:
 
-        # Only adopters & owners can book services
         if request.user.role not in ["adopter", "owner"]:
+            messages.error(request, "You are not allowed to book services.")
             return redirect("home")
 
         pet_id = request.POST.get("pet_id")
         service_id = request.POST.get("service_id")
         date = request.POST.get("date")
         time = request.POST.get("time")
-        notes = request.POST.get("message")
+        notes = request.POST.get("message", "")
 
-        owned_pet = OwnedPet.objects.filter(
+        # Basic validation
+        if not pet_id or not service_id or not date or not time:
+            messages.error(request, "Please fill all required fields.")
+            return redirect(request.META.get("HTTP_REFERER", "home"))
+
+        # Ownership validation (STRICT)
+        owned_pet = get_object_or_404(
+            OwnedPet,
             id=pet_id,
             owner=request.user
-        ).first()
+        )
 
-        service = Service.objects.filter(
+        # Active service validation
+        service = get_object_or_404(
+            Service,
             id=service_id,
             is_active=True
-        ).first()
+        )
 
-        if not owned_pet or not service:
-            # Fallback to home if tampered / invalid
-            return redirect("home")
-
+        # ✅ SAVE (now safe)
         ServiceAppointment.objects.create(
             user=request.user,
             owned_pet=owned_pet,
             service=service,
             appointment_date=date,
             appointment_time=time,
-            notes=notes or "",
+            notes=notes,
         )
 
+        messages.success(
+            request,
+            f"Appointment booked for {owned_pet.pet.name}."
+        )
         return redirect("home")
 
-    # -------------------------------
-    # CASE 2: Public Appointment (old behavior)
-    # -------------------------------
+    # ==================================================
+    # CASE 2: Public Appointment (Old behavior)
+    # ==================================================
     Appointment.objects.create(
         name=request.POST.get("name"),
         email=request.POST.get("email"),
@@ -105,10 +111,9 @@ def make_appointment(request):
         message=request.POST.get("message"),
     )
 
+    messages.success(request, "Appointment request submitted.")
     return redirect("home")
 
-
-# ======================================================
 # AUTH
 # ======================================================
 
@@ -438,12 +443,25 @@ def adopter_adoptions(request):
     )
 
 
-@login_required
 def adopter_appointments(request):
-    if request.user.role != "adopter":
-        return redirect("home")
-    return render(request, "core/appointments_adopter.html")
+    services = Service.objects.filter(is_active=True)
 
+    pets = []
+
+    if request.user.role == "owner":
+        pets = OwnedPet.objects.filter(owner=request.user)
+
+    elif request.user.role == "adopter":
+        pets = AdoptionRequest.objects.filter(
+            adopter=request.user,
+            status="approved",
+            owned_pet__isnull=False
+        ).select_related("owned_pet")
+
+    return render(request, "core/adopter/appointments.html", {
+        "pets": pets,
+        "services": services,
+    })
 
 # ---------- OWNER ----------
 @login_required

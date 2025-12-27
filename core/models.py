@@ -40,7 +40,7 @@ class News(models.Model):
 
 
 # =========================
-# APPOINTMENT
+# APPOINTMENT (Public)
 # =========================
 class Appointment(models.Model):
     name = models.CharField(max_length=100)
@@ -72,7 +72,6 @@ class OwnedPet(models.Model):
 
     acquired_at = models.DateTimeField(auto_now_add=True)
 
-    # Owner controls adoption visibility
     is_listed_for_adoption = models.BooleanField(default=False)
 
     def __str__(self):
@@ -96,7 +95,6 @@ class AdoptionRequest(models.Model):
         related_name="adoption_requests"
     )
 
-    # Shelter pet adoption
     pet = models.ForeignKey(
         Pet,
         on_delete=models.CASCADE,
@@ -105,7 +103,6 @@ class AdoptionRequest(models.Model):
         related_name="shelter_adoption_requests"
     )
 
-    # Owner pet adoption
     owned_pet = models.ForeignKey(
         OwnedPet,
         on_delete=models.CASCADE,
@@ -124,26 +121,15 @@ class AdoptionRequest(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # ---------- VALIDATION ----------
     def clean(self):
         if not self.pet and not self.owned_pet:
-            raise ValidationError(
-                "Either pet or owned_pet must be selected."
-            )
-
+            raise ValidationError("Either pet or owned_pet must be selected.")
         if self.pet and self.owned_pet:
-            raise ValidationError(
-                "Only one of pet or owned_pet can be selected."
-            )
+            raise ValidationError("Only one of pet or owned_pet can be selected.")
 
-    # ---------- HELPERS ----------
     @property
     def target_pet_name(self):
-        if self.pet:
-            return self.pet.name
-        if self.owned_pet:
-            return self.owned_pet.pet.name
-        return "N/A"
+        return self.pet.name if self.pet else self.owned_pet.pet.name
 
     @property
     def adoption_type(self):
@@ -151,6 +137,8 @@ class AdoptionRequest(models.Model):
 
     def __str__(self):
         return f"{self.adopter.username} → {self.target_pet_name}"
+
+
 # =========================
 # SERVICE CATEGORY
 # =========================
@@ -176,23 +164,18 @@ class Service(models.Model):
     name = models.CharField(max_length=150)
     description = models.TextField(blank=True)
 
-    price = models.DecimalField(
-        max_digits=8,
-        decimal_places=2
-    )
-
-    duration_minutes = models.PositiveIntegerField(
-        help_text="Duration of service in minutes"
-    )
+    price = models.DecimalField(max_digits=8, decimal_places=2)
+    duration_minutes = models.PositiveIntegerField()
 
     is_active = models.BooleanField(default=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.name} ({self.category.name})"
+
+
 # =========================
-# SERVICE APPOINTMENT (Grooming / Vet Booking)
+# SERVICE APPOINTMENT
 # =========================
 class ServiceAppointment(models.Model):
 
@@ -231,12 +214,7 @@ class ServiceAppointment(models.Model):
     )
 
     notes = models.TextField(blank=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return (
-            f"{self.service.name} | "
-            f"{self.owned_pet.pet.name} | "
-            f"{self.appointment_date}"
-        )
+        return f"{self.service.name} | {self.owned_pet.pet.name} | {self.appointment_date}"
