@@ -1,0 +1,43 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container" style="margin-top: 140px; max-width: 600px;">
+
+    <div class="card">
+        <div class="card-body text-center">
+
+            <h3 class="mb-3">Complete Payment</h3>
+
+            <p>
+                <strong>Order ID:</strong> #{{ order.id }}
+            </p>
+
+            <p>
+                <strong>Amount Payable:</strong> ₹ {{ order.total_amount }}
+            </p>
+
+            <hr>
+
+            <p class="text-muted">
+                This is a mock payment page.<br>
+                Real payment gateway will be integrated later.
+            </p>
+
+            <div class="mt-4">
+                <a href="{% url 'shop:payment_success' order.id %}"
+                   class="btn btn-success">
+                    Pay Now (Mock)
+                </a>
+            </div>
+
+            <div class="mt-3">
+                <a href="{% url 'shop:cart_detail' %}" class="btn btn-link">
+                    Back to Cart
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
