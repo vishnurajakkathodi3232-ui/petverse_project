@@ -5,4 +5,7 @@ app_name = 'services'
 
 urlpatterns = [
     path('', views.temp_services_home, name='services_home'),
+    path(
+    'owner/appointments/',views.owner_service_appointments,name='owner_service_appointments'),
+
 ]

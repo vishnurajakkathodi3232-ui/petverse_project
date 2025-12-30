@@ -100,6 +100,25 @@
         .topbar .user-area {
             float: right;
         }
+        .panel {
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.panel-body {
+    padding: 20px;
+}
+
+.panel-default {
+    border: 1px solid #e6e6e6;
+}
+
+.panel-info > .panel-heading {
+    background: #eaf3ff;
+    color: #2b5cff;
+    font-weight: 600;
+}
+
     </style>
 
     {% block extra_css %}{% endblock %}
@@ -189,7 +208,8 @@
         {% endif %}
 
         <!-- OWNER MENU -->
-        {% if user.ownedpet_set.all %}
+        {% if user.role == "owner" %}
+
         <h4>Owner</h4>
         <ul>
             <li>
@@ -205,6 +225,12 @@
                     <i class="fa fa-check-circle"></i> Requests
                 </a>
             </li>
+            <li>
+    <a href="{% url 'owner_appointments' %}"
+       class="{% if request.resolver_match.url_name == 'owner_appointments' %}active{% endif %}">
+        <i class="fa fa-calendar"></i> Appointments
+    </a>
+</li>
 
             <li>
                 <a href="{% url 'chat' %}"
@@ -259,9 +285,14 @@
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main class="main-content">
-        {% block content %}{% endblock %}
-    </main>
+<main class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</main>
+
 
 </div>
 

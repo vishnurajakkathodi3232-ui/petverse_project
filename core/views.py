@@ -23,18 +23,17 @@ from .models import Service
 from itertools import chain
 from .models import OwnedPet, Service
 def home(request):
-    pets = Pet.objects.filter(is_available=True)[:6]
-    news = News.objects.all()[:3]
+    # Show ALL pets on homepage
+    pets = Pet.objects.all().order_by("-id")
 
-    owned_pets = []
     services = Service.objects.filter(is_active=True)
 
+    owned_pets = []
     if request.user.is_authenticated:
         owned_pets = OwnedPet.objects.filter(owner=request.user)
 
     return render(request, "core/home.html", {
         "pets": pets,
-        "news": news,
         "owned_pets": owned_pets,
         "services": services,
     })
@@ -442,26 +441,22 @@ def adopter_adoptions(request):
         {"requests": requests}
     )
 
-
+@login_required
 def adopter_appointments(request):
-    services = Service.objects.filter(is_active=True)
+    from .models import ServiceAppointment
 
-    pets = []
+    appointments = ServiceAppointment.objects.filter(
+        user=request.user
+    ).select_related(
+        "owned_pet__pet",
+        "service"
+    ).order_by("-created_at")
 
-    if request.user.role == "owner":
-        pets = OwnedPet.objects.filter(owner=request.user)
-
-    elif request.user.role == "adopter":
-        pets = AdoptionRequest.objects.filter(
-            adopter=request.user,
-            status="approved",
-            owned_pet__isnull=False
-        ).select_related("owned_pet")
-
-    return render(request, "core/adopter/appointments.html", {
-        "pets": pets,
-        "services": services,
-    })
+    return render(
+        request,
+        "core/adopter/appointments.html",
+        {"appointments": appointments}
+    )
 
 # ---------- OWNER ----------
 @login_required
@@ -512,8 +507,20 @@ def owner_adoptions(request):
 
 @login_required
 def owner_appointments(request):
-    return render(request, "core/owner_appointments.html")
+    from .models import ServiceAppointment
 
+    appointments = ServiceAppointment.objects.filter(
+        owned_pet__owner=request.user
+    ).select_related(
+        "owned_pet__pet",
+        "service"
+    ).order_by("-created_at")
+
+    return render(
+        request,
+        "core/owner_appointments.html",
+        {"appointments": appointments}
+    )
 
 @login_required
 def owner_profile(request):
@@ -774,4 +781,73 @@ def my_service_appointments(request):
         request,
         "core/my_service_appointments.html",
         {"appointments": appointments}
+    )
+@login_required
+def appointment_page(request):
+    services = Service.objects.filter(is_active=True)
+    pets = OwnedPet.objects.filter(owner=request.user)
+
+    return render(
+        request,
+        "core/appointment_page.html",
+        {
+            "services": services,
+            "pets": pets,
+        }
+    )
+@login_required
+def appointment_page(request):
+    if request.user.role not in ["adopter", "owner"]:
+        return redirect("home")
+
+    pets = OwnedPet.objects.filter(owner=request.user)
+    services = Service.objects.filter(is_active=True)
+
+    return render(request, "core/appointment_page.html", {
+        "pets": pets,
+        "services": services,
+    })
+@login_required
+def chat_room(request, request_id):
+    adoption_request = get_object_or_404(AdoptionRequest, id=request_id)
+
+    # Permission check
+    allowed_users = [
+        adoption_request.adopter,
+    ]
+
+    if adoption_request.pet:
+        allowed_users.append(adoption_request.pet.added_by)
+
+    if adoption_request.owned_pet:
+        allowed_users.append(adoption_request.owned_pet.owner)
+
+    if request.user not in allowed_users:
+        return redirect("home")
+
+    # Get or create chat room
+    room, created = ChatRoom.objects.get_or_create(
+        adoption_request=adoption_request
+    )
+
+    if request.method == "POST":
+        message = request.POST.get("message")
+        if message:
+            ChatMessage.objects.create(
+                room=room,
+                sender=request.user,
+                message=message
+            )
+        return redirect("chat_room", request_id=request_id)
+
+    messages = room.messages.select_related("sender").order_by("timestamp")
+
+    return render(
+        request,
+        "core/chat_room.html",
+        {
+            "room": room,
+            "messages": messages,
+            "adoption_request": adoption_request
+        }
     )

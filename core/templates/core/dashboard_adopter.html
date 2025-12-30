@@ -1,23 +1,45 @@
 {% extends "core/base_inner.html" %}
-
 {% block title %}Adopter Dashboard | PetVerse{% endblock %}
 
 {% block content %}
 
-<h2 class="mb-3">Welcome, {{ user.first_name|default:user.username }} 👋</h2>
-<p class="text-muted">Manage your adoptions, favorite pets, and activities.</p>
+<style>
+    .dashboard-card {
+        background: #faf7f2;
+        border: 1px solid #e6dfd4;
+        border-radius: 12px;
+        transition: all 0.25s ease;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+    }
+
+    .dashboard-card i {
+        margin-bottom: 10px;
+    }
+</style>
+
+<h2 class="mb-2">
+    Welcome, {{ user.first_name|default:user.username }} 👋
+</h2>
+<p class="text-muted">
+    Manage your adoptions, appointments, and activities.
+</p>
 
 <hr>
 
+<!-- ROW 1 -->
 <div class="row">
 
     <!-- BROWSE PETS -->
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-body text-center">
+    <div class="col-md-3">
+        <div class="panel dashboard-card text-center">
+            <div class="panel-body">
                 <i class="fa fa-paw fa-3x text-primary"></i>
-                <h4 class="mt-2">Browse Pets</h4>
-                <p class="text-muted">Find your next companion</p>
+                <h4>Browse Pets</h4>
+                <p class="text-muted">Find your companion</p>
                 <a href="{% url 'pets_list' %}" class="btn btn-primary btn-sm">
                     Explore
                 </a>
@@ -26,12 +48,12 @@
     </div>
 
     <!-- MY ADOPTIONS -->
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-body text-center">
+    <div class="col-md-3">
+        <div class="panel dashboard-card text-center">
+            <div class="panel-body">
                 <i class="fa fa-heart fa-3x text-danger"></i>
-                <h4 class="mt-2">My Adoptions</h4>
-                <p class="text-muted">Track adoption requests</p>
+                <h4>My Adoptions</h4>
+                <p class="text-muted">Track requests</p>
                 <a href="{% url 'adopter_adoptions' %}" class="btn btn-danger btn-sm">
                     View
                 </a>
@@ -39,15 +61,29 @@
         </div>
     </div>
 
-    <!-- FAVORITES -->
-    <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-body text-center">
-                <i class="fa fa-star fa-3x text-warning"></i>
-                <h4 class="mt-2">Favorites</h4>
-                <p class="text-muted">Pets you saved</p>
-                <a href="{% url 'adopter_favorites' %}" class="btn btn-warning btn-sm">
-                    Open
+    <!-- APPOINTMENTS -->
+    <div class="col-md-3">
+        <div class="panel dashboard-card text-center">
+            <div class="panel-body">
+                <i class="fa fa-calendar fa-3x text-info"></i>
+                <h4>Appointments</h4>
+                <p class="text-muted">Vet & services</p>
+                <a href="{% url 'appointment_page' %}" class="btn btn-info btn-sm">
+                    Manage
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHOP -->
+    <div class="col-md-3">
+        <div class="panel dashboard-card text-center">
+            <div class="panel-body">
+                <i class="fa fa-shopping-cart fa-3x" style="color:#6b8e23;"></i>
+                <h4>Shop</h4>
+                <p class="text-muted">Pet products</p>
+                <a href="{% url 'shop:product_list' %}" class="btn btn-success btn-sm">
+                    Go to Shop
                 </a>
             </div>
         </div>
@@ -57,53 +93,39 @@
 
 <hr>
 
+<!-- ROW 2 -->
 <div class="row">
 
-    <!-- APPOINTMENTS -->
+    <!-- PROFILE -->
     <div class="col-md-6">
-        <div class="panel panel-info">
-            <div class="panel-heading">
-                <strong><i class="fa fa-calendar"></i> Appointments</strong>
-            </div>
+        <div class="panel dashboard-card text-center">
             <div class="panel-body">
-                <p class="text-muted">
-                    View or schedule vet appointments.
-                </p>
-                <a href="{% url 'adopter_appointments' %}" class="btn btn-info btn-sm">
-                    Manage Appointments
+                <i class="fa fa-user fa-3x text-primary"></i>
+                <h4>My Profile</h4>
+                <p class="text-muted">View personal details</p>
+                <a href="{% url 'adopter_profile' %}" class="btn btn-primary btn-sm">
+                    Open Profile
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- CHAT -->
+    <!-- CHAT (DISABLED FOR NOW) -->
     <div class="col-md-6">
-        <div class="panel panel-success">
-            <div class="panel-heading">
-                <strong><i class="fa fa-comments"></i> Chat Support</strong>
-            </div>
+        <div class="panel dashboard-card text-center">
             <div class="panel-body">
+                <i class="fa fa-comments fa-3x text-muted"></i>
+                <h4>Chat</h4>
                 <p class="text-muted">
-                    Talk to shelters, owners, or support.
+                    Available after adoption request approval
                 </p>
-                <a href="#" class="btn btn-success btn-sm">
-                    Open Chat
-                </a>
+                <button class="btn btn-default btn-sm" disabled>
+                    Coming Soon
+                </button>
             </div>
         </div>
     </div>
 
 </div>
-
-{% comment %}
-OWNER ACCESS UNLOCK MESSAGE
-{% endcomment %}
-{% if user.ownedpet_set.all %}
-<hr>
-<div class="alert alert-success">
-    <strong>🎉 Owner Access Unlocked!</strong><br>
-    You can now manage pets and receive adoption requests.
-</div>
-{% endif %}
 
 {% endblock %}

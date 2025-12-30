@@ -1,18 +1,75 @@
-{% extends "core/base.html" %}
+{% extends "core/base_inner.html" %}
+
+{% block title %}My Profile | PetVerse{% endblock %}
 
 {% block content %}
-<div class="container" style="margin-top:150px;">
-    <h2>My Profile</h2>
 
-    <p><strong>Name:</strong> {{ user.first_name }}</p>
-    <p><strong>Username:</strong> {{ user.username }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Phone:</strong> {{ user.phone }}</p>
-    <p><strong>Address:</strong> {{ user.address }}</p>
-    <p><strong>Role:</strong> {{ user.role }}</p>
+<style>
+    .profile-card {
+        background: #faf7f2;
+        border: 1px solid #e6dfd4;
+        border-radius: 12px;
+        padding: 25px;
+    }
 
-    <hr>
+    .profile-icon {
+        font-size: 90px;
+        color: #2b5cff;
+        margin-bottom: 15px;
+    }
+</style>
 
-    <p>This is your adopter profile page. Later we will make it editable.</p>
+<div class="container" style="max-width:900px;">
+
+    <div class="row">
+
+        <!-- LEFT PROFILE -->
+        <div class="col-md-4 text-center">
+            <div class="profile-card">
+                <i class="fa fa-user-circle profile-icon"></i>
+                <h3>{{ user.first_name|default:user.username }}</h3>
+                <p class="text-muted">Adopter</p>
+            </div>
+        </div>
+
+        <!-- RIGHT DETAILS -->
+        <div class="col-md-8">
+            <div class="profile-card">
+                <h4 class="mb-3">Profile Information</h4>
+
+                <table class="table table-bordered">
+                    <tr>
+                        <th width="30%">Username</th>
+                        <td>{{ user.username }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email</th>
+                        <td>{{ user.email }}</td>
+                    </tr>
+                    <tr>
+                        <th>Phone</th>
+                        <td>{{ user.phone|default:"—" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Address</th>
+                        <td>{{ user.address|default:"—" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Role</th>
+                        <td class="text-capitalize">{{ user.role }}</td>
+                    </tr>
+                </table>
+
+                <div class="text-right">
+                    <a href="{% url 'adopter_dashboard' %}" class="btn btn-default">
+                        ← Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
+
 {% endblock %}

@@ -235,3 +235,22 @@ def payment_success(request, order_id):
     order.save()
 
     return render(request, 'shop/payment_success.html', {'order': order})
+from django.contrib.auth.decorators import login_required
+from .models import Order
+
+
+@login_required
+def my_orders(request):
+    """
+    Shows logged-in user's order history.
+    """
+
+    orders = Order.objects.filter(
+        user=request.user
+    ).order_by('-created_at')
+
+    context = {
+        'orders': orders,
+    }
+
+    return render(request, 'shop/my_orders.html', context)

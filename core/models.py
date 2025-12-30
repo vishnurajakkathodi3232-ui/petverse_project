@@ -218,3 +218,36 @@ class ServiceAppointment(models.Model):
 
     def __str__(self):
         return f"{self.service.name} | {self.owned_pet.pet.name} | {self.appointment_date}"
+from django.db import models
+from django.conf import settings
+
+User = settings.AUTH_USER_MODEL
+
+
+class ChatRoom(models.Model):
+    adoption_request = models.OneToOneField(
+        "AdoptionRequest",
+        on_delete=models.CASCADE,
+        related_name="chat_room"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Chat for Request #{self.adoption_request.id}"
+
+
+class ChatMessage(models.Model):
+    room = models.ForeignKey(
+        ChatRoom,
+        on_delete=models.CASCADE,
+        related_name="messages"
+    )
+    sender = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message by {self.sender}"

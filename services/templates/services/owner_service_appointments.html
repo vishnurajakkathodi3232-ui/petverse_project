@@ -1,0 +1,46 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container" style="margin-top: 140px;">
+
+    <h2 class="mb-4">Service Appointments for My Pets</h2>
+
+    {% if appointments %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Pet</th>
+                    <th>Service</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in appointments %}
+                    <tr>
+                        <td>{{ appointment.pet.name }}</td>
+                        <td>{{ appointment.service.name }}</td>
+                        <td>{{ appointment.date }}</td>
+                        <td>{{ appointment.time }}</td>
+                        <td>
+                            {% if appointment.status == 'pending' %}
+                                <span class="text-warning">Pending</span>
+                            {% elif appointment.status == 'approved' %}
+                                <span class="text-success">Approved</span>
+                            {% elif appointment.status == 'rejected' %}
+                                <span class="text-danger">Rejected</span>
+                            {% else %}
+                                {{ appointment.status }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No service appointments found for your pets.</p>
+    {% endif %}
+
+</div>
+{% endblock %}

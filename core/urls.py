@@ -6,6 +6,8 @@ urlpatterns = [
     # -------------------- PUBLIC ROUTES --------------------
     path("", views.home, name="home"),
     path("dashboard/", views.dashboard_redirect, name="dashboard"),
+    path("appointments/book/", views.appointment_page, name="appointment_page"),
+
 
     path("appointment/", views.make_appointment, name="appointment"),
     path("signup/", views.signup, name="signup"),
@@ -73,6 +75,10 @@ urlpatterns = [
     path("superadmin/adoptions/<int:pk>/approve/",views.admin_approve_adoption,name="admin_approve_adoption"),
     path("superadmin/adoptions/<int:pk>/reject/",views.admin_reject_adoption,name="admin_reject_adoption"),
     path("my-services/",views.my_service_appointments,name="my_service_appointments"),
+    path("appointments/book/", views.appointment_page, name="appointment_page"),
+    path("chat/<int:request_id>/", views.chat_room, name="chat_room"),
+
+
 
 
 ]
