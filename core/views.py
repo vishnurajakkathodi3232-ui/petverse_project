@@ -3,6 +3,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout, get_user_model
+from .models import Payment
+
 
 from .models import (
     Pet,
@@ -83,7 +85,7 @@ def make_appointment(request):
         )
 
         # ✅ SAVE (now safe)
-        ServiceAppointment.objects.create(
+        appointment = ServiceAppointment.objects.create(
             user=request.user,
             owned_pet=owned_pet,
             service=service,
@@ -91,6 +93,16 @@ def make_appointment(request):
             appointment_time=time,
             notes=notes,
         )
+
+# 🔹 CREATE PAYMENT (AUTO)
+        Payment.objects.create(
+            user=request.user,
+            payment_for="appointment",
+            amount=service.price,
+            appointment=appointment,
+            status="pending"
+        )
+
 
         messages.success(
             request,
@@ -644,6 +656,64 @@ def chat(request):
 def payment(request):
     return render(request, "core/payment.html")
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Payment
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Payment
+
+@login_required
+def payment_review(request, payment_id):
+    payment = get_object_or_404(
+        Payment,
+        id=payment_id,
+        user=request.user,
+        status="pending"
+    )
+
+    return render(request, "core/payment_review.html", {
+        "payment": payment
+    })
+
+@login_required
+def payment_success(request, payment_id):
+    payment = get_object_or_404(
+        Payment,
+        id=payment_id,
+        user=request.user,
+        status="paid"
+    )
+
+    return render(request, "core/payment_success.html", {
+        "payment": payment
+    })
+@login_required
+def payment_history(request):
+    user = request.user
+
+    payments_made = Payment.objects.filter(
+        user=user,
+        status="paid"
+    ).order_by("-created_at")
+
+    payments_received = Payment.objects.none()
+
+    # Owner / Shelter earnings (only adoption payments)
+    if user.role in ["owner", "shelter"]:
+        payments_received = Payment.objects.filter(
+            receiver=user,
+            status="paid"
+        ).order_by("-created_at")
+
+    return render(request, "core/payment_history.html", {
+        "payments_made": payments_made,
+        "payments_received": payments_received,
+    })
+
 
 # ---------- SUPER ADMIN ----------
 @login_required
@@ -807,25 +877,24 @@ def appointment_page(request):
         "pets": pets,
         "services": services,
     })
+from .models import ChatRoom, ChatMessage
+
+
 @login_required
-def chat_room(request, request_id):
-    adoption_request = get_object_or_404(AdoptionRequest, id=request_id)
+def chat_room(request,  req_id):
+    adoption_request = get_object_or_404(
+        AdoptionRequest,
+        id= req_id
+    )
 
     # Permission check
-    allowed_users = [
+    if request.user not in [
         adoption_request.adopter,
-    ]
+        getattr(adoption_request, "owned_pet", None) and adoption_request.owned_pet.owner,
+        adoption_request.pet and adoption_request.pet.added_by
+    ]:
+        return redirect("dashboard")
 
-    if adoption_request.pet:
-        allowed_users.append(adoption_request.pet.added_by)
-
-    if adoption_request.owned_pet:
-        allowed_users.append(adoption_request.owned_pet.owner)
-
-    if request.user not in allowed_users:
-        return redirect("home")
-
-    # Get or create chat room
     room, created = ChatRoom.objects.get_or_create(
         adoption_request=adoption_request
     )
@@ -838,16 +907,42 @@ def chat_room(request, request_id):
                 sender=request.user,
                 message=message
             )
-        return redirect("chat_room", request_id=request_id)
 
-    messages = room.messages.select_related("sender").order_by("timestamp")
+    messages = room.messages.select_related("sender").order_by("created_at")
 
-    return render(
-        request,
-        "core/chat_room.html",
-        {
-            "room": room,
-            "messages": messages,
-            "adoption_request": adoption_request
-        }
+    return render(request, "core/chat_room.html", {
+        "room": room,
+        "messages": messages,
+        "request_obj": adoption_request
+    })
+from .models import ChatRoom, AdoptionRequest
+from django.db.models import Q
+
+@login_required
+def chat_inbox(request):
+    rooms = ChatRoom.objects.filter(
+        Q(adoption_request__adopter=request.user) |
+        Q(adoption_request__pet__added_by=request.user) |
+        Q(adoption_request__owned_pet__owner=request.user)
+    ).select_related("adoption_request")
+
+    return render(request, "core/chat_inbox.html", {
+        "rooms": rooms
+    })
+
+from .utils import generate_payment_receipt
+from .models import Payment
+
+
+@login_required
+def download_payment_receipt(request, payment_id):
+    payment = get_object_or_404(
+        Payment,
+        id=payment_id,
+        user=request.user
     )
+
+    if payment.status != "paid":
+        return redirect("dashboard")
+
+    return generate_payment_receipt(payment)

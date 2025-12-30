@@ -1,0 +1,65 @@
+{% extends "core/base_inner.html" %}
+
+{% block title %}Payment Successful | PetVerse{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+
+        <div class="panel panel-success text-center">
+            <div class="panel-body">
+
+                <i class="fa fa-check-circle fa-4x text-success"></i>
+                <h2 class="mt-3">Payment Successful 🎉</h2>
+
+                <p class="text-muted">
+                    Thank you! Your payment has been completed successfully.
+                </p>
+
+                <hr>
+
+                <table class="table table-bordered text-left">
+                    <tr>
+                        <th>Payment Type</th>
+                        <td>{{ payment.payment_for|title }}</td>
+                    </tr>
+                    <tr>
+                        <th>Amount Paid</th>
+                        <td><strong>₹ {{ payment.amount }}</strong></td>
+                    </tr>
+                    <tr>
+                        <th>Transaction Date</th>
+                        <td>{{ payment.created_at|date:"M d, Y" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Status</th>
+                        <td>
+                            <span class="label label-success">Paid</span>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="mt-3">
+                    <a href="{% url 'dashboard' %}" class="btn btn-primary">
+                        Go to Dashboard
+                    </a>
+
+                    <a href="{% url 'payment_receipt' payment.id %}"
+                        class="btn btn-success btn-sm">
+                        <i class="fa fa-download"></i> Download Receipt (PDF)
+                    </a>
+
+                </div>
+
+                <p class="text-muted mt-2">
+                    Receipt email will be sent to your registered email.
+                </p>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

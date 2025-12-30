@@ -6,7 +6,8 @@
 
 <h2 class="mb-3">My Adoption Requests 🐾</h2>
 <p class="text-muted">
-    Track the status of all adoption requests you have submitted.
+    Track the status of all adoption requests you have submitted
+    and communicate with owners or shelters.
 </p>
 
 <hr>
@@ -21,6 +22,7 @@
                 <th>Type</th>
                 <th>Status</th>
                 <th>Requested On</th>
+                <th>Chat</th>
             </tr>
         </thead>
         <tbody>
@@ -48,6 +50,13 @@
 
                 <td>
                     {{ req.created_at|date:"M d, Y" }}
+                </td>
+
+                <td>
+                    <a href="{% url 'chat_room' req.id %}"
+                       class="btn btn-info btn-xs">
+                        <i class="fa fa-comments"></i> Open
+                    </a>
                 </td>
             </tr>
             {% endfor %}

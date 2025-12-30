@@ -109,22 +109,23 @@
             </div>
         </div>
     </div>
+<!-- CHAT -->
+<div class="col-md-6">
+    <div class="panel dashboard-card text-center">
+        <div class="panel-body">
+            <i class="fa fa-comments fa-3x text-primary"></i>
+            <h4>Chat</h4>
+            <p class="text-muted">
+                Conversations with owners & shelters
+            </p>
 
-    <!-- CHAT (DISABLED FOR NOW) -->
-    <div class="col-md-6">
-        <div class="panel dashboard-card text-center">
-            <div class="panel-body">
-                <i class="fa fa-comments fa-3x text-muted"></i>
-                <h4>Chat</h4>
-                <p class="text-muted">
-                    Available after adoption request approval
-                </p>
-                <button class="btn btn-default btn-sm" disabled>
-                    Coming Soon
-                </button>
-            </div>
+            <a href="{% url 'chat_inbox' %}"
+               class="btn btn-primary btn-sm">
+                Open Chats
+            </a>
         </div>
     </div>
+</div>
 
 </div>
 

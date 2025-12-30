@@ -218,15 +218,13 @@ class ServiceAppointment(models.Model):
 
     def __str__(self):
         return f"{self.service.name} | {self.owned_pet.pet.name} | {self.appointment_date}"
-from django.db import models
-from django.conf import settings
 
 User = settings.AUTH_USER_MODEL
 
 
 class ChatRoom(models.Model):
     adoption_request = models.OneToOneField(
-        "AdoptionRequest",
+        AdoptionRequest,
         on_delete=models.CASCADE,
         related_name="chat_room"
     )
@@ -243,11 +241,87 @@ class ChatMessage(models.Model):
         related_name="messages"
     )
     sender = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
     message = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Message by {self.sender}"
+        return f"{self.sender.username}: {self.message[:20]}"
+
+
+class Payment(models.Model):
+    PAYMENT_FOR_CHOICES = (
+        ("appointment", "Appointment"),
+        ("adoption", "Adoption"),
+        ("shop", "Shop"),
+    )
+
+    STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("paid", "Paid"),
+        ("failed", "Failed"),
+    )
+
+    # Who paid
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="payments_made"
+    )
+
+    # Who receives money (for adoption only)
+    receiver = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="payments_received"
+    )
+
+    payment_for = models.CharField(
+        max_length=20,
+        choices=PAYMENT_FOR_CHOICES
+    )
+
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default="pending"
+    )
+
+    # Generic references (ONLY ONE will be filled)
+    appointment = models.ForeignKey(
+        "ServiceAppointment",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    adoption_request = models.ForeignKey(
+        "AdoptionRequest",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    order = models.ForeignKey(
+    "shop.Order",
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name="core_payments"
+)
+
+    
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.payment_for} | ₹{self.amount} | {self.status}"

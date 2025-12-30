@@ -1,0 +1,74 @@
+{% extends "core/base_inner.html" %}
+
+{% block title %}Payment History | PetVerse{% endblock %}
+
+{% block content %}
+
+<h2>Payment History 💰</h2>
+<p class="text-muted">View all your completed transactions.</p>
+
+<hr>
+
+<!-- PAYMENTS MADE -->
+<h4>Payments Made</h4>
+
+{% if payments_made %}
+<div class="table-responsive">
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in payments_made %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ p.payment_for|title }}</td>
+                <td>₹ {{ p.amount }}</td>
+                <td>{{ p.created_at|date:"M d, Y" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    No payments made yet.
+</div>
+{% endif %}
+
+{% if payments_received %}
+<hr>
+
+<!-- PAYMENTS RECEIVED -->
+<h4>Payments Received</h4>
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>From</th>
+                <th>Amount</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in payments_received %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ p.user.username }}</td>
+                <td>₹ {{ p.amount }}</td>
+                <td>{{ p.created_at|date:"M d, Y" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% endblock %}

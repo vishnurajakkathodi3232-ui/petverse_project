@@ -1,0 +1,70 @@
+{% extends "core/base_inner.html" %}
+
+{% block title %}Payment Review | PetVerse{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-3">Review Payment 💳</h2>
+<p class="text-muted">
+    Please verify the details before confirming payment.
+</p>
+
+<hr>
+
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+
+                <h4 class="text-center mb-3">
+                    <i class="fa fa-receipt"></i> Payment Summary
+                </h4>
+
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Payment Type</th>
+                        <td>{{ payment.payment_for|title }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>Amount</th>
+                        <td><strong>₹ {{ payment.amount }}</strong></td>
+                    </tr>
+
+                    <tr>
+                        <th>Status</th>
+                        <td>
+                            <span class="label label-warning">
+                                {{ payment.status|title }}
+                            </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>Date</th>
+                        <td>{{ payment.created_at|date:"M d, Y" }}</td>
+                    </tr>
+                </table>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-check"></i> Confirm Payment
+                        </button>
+
+                        <a href="{% url 'dashboard' %}"
+                           class="btn btn-default">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

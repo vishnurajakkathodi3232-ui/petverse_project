@@ -4,7 +4,7 @@
 
 {% block content %}
 <h2>Adoption Requests 📩</h2>
-<p>Review adoption requests for your pets.</p>
+<p class="text-muted">Review adoption requests and communicate with adopters.</p>
 
 <hr>
 
@@ -18,7 +18,7 @@
 
                 <h4>
                     <i class="fa fa-paw"></i>
-                    {{ req.owned_pet.name }}
+                    {{ req.owned_pet.pet.name }}
                 </h4>
 
                 <p>
@@ -38,17 +38,24 @@
                     {% endif %}
                 </p>
 
-                {% if req.status == "pending" %}
                 <hr>
-                <a href="{% url 'owner_approve_request' req.id %}"
-                   class="btn btn-success btn-sm">
-                    <i class="fa fa-check"></i> Approve
+
+                <!-- CHAT BUTTON (AVAILABLE ALWAYS) -->
+                <a href="{% url 'chat_room' req.id %}"
+                   class="btn btn-info btn-sm">
+                    <i class="fa fa-comments"></i> Open Chat
                 </a>
 
-                <a href="{% url 'owner_reject_request' req.id %}"
-                   class="btn btn-danger btn-sm">
-                    <i class="fa fa-times"></i> Reject
-                </a>
+                {% if req.status == "pending" %}
+                    <a href="{% url 'owner_approve_request' req.id %}"
+                       class="btn btn-success btn-sm">
+                        <i class="fa fa-check"></i> Approve
+                    </a>
+
+                    <a href="{% url 'owner_reject_request' req.id %}"
+                       class="btn btn-danger btn-sm">
+                        <i class="fa fa-times"></i> Reject
+                    </a>
                 {% endif %}
 
             </div>
