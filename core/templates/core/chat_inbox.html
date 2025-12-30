@@ -9,16 +9,33 @@
 {% if rooms %}
 <div class="list-group">
     {% for room in rooms %}
-        <a href="{% url 'chat_room' room.adoption_request.id %}"
-           class="list-group-item list-group-item-action">
+<a href="{% url 'chat_room' room.adoption_request.id %}"
+   class="list-group-item list-group-item-action">
+
+    <div class="row">
+        <div class="col-md-8">
             <strong>
                 {{ room.adoption_request.target_pet_name }}
             </strong>
-            <br>
-            <small class="text-muted">
-                Adoption Request #{{ room.adoption_request.id }}
-            </small>
-        </a>
+
+            <div class="text-muted" style="font-size:13px;">
+                {{ room.adoption_request.adoption_type }} Adoption
+            </div>
+        </div>
+
+        <div class="col-md-4 text-right">
+            {% if room.adoption_request.status == "pending" %}
+                <span class="label label-warning">Pending</span>
+            {% elif room.adoption_request.status == "approved" %}
+                <span class="label label-success">Approved</span>
+            {% else %}
+                <span class="label label-danger">Declined</span>
+            {% endif %}
+        </div>
+    </div>
+
+</a>
+
     {% endfor %}
 </div>
 {% else %}

@@ -452,24 +452,23 @@ def adopter_adoptions(request):
         "core/adoptions_adopter.html",
         {"requests": requests}
     )
-
 @login_required
 def adopter_appointments(request):
-    from .models import ServiceAppointment
+    if request.user.role != "adopter":
+        return redirect("home")
 
     appointments = ServiceAppointment.objects.filter(
         user=request.user
     ).select_related(
         "owned_pet__pet",
         "service"
-    ).order_by("-created_at")
+    ).order_by("-appointment_date", "-appointment_time")
 
     return render(
         request,
         "core/adopter/appointments.html",
         {"appointments": appointments}
     )
-
 # ---------- OWNER ----------
 @login_required
 def owner_add_pet(request):
@@ -517,22 +516,30 @@ def owner_adoptions(request):
     )
 
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .models import ServiceAppointment
+
 @login_required
 def owner_appointments(request):
-    from .models import ServiceAppointment
+    if request.user.role != "owner":
+        return redirect("home")
 
     appointments = ServiceAppointment.objects.filter(
         owned_pet__owner=request.user
     ).select_related(
         "owned_pet__pet",
         "service"
-    ).order_by("-created_at")
+    ).order_by("-appointment_date", "-appointment_time")
 
     return render(
         request,
         "core/owner_appointments.html",
-        {"appointments": appointments}
+        {
+            "appointments": appointments
+        }
     )
+
 
 @login_required
 def owner_profile(request):
@@ -852,10 +859,23 @@ def my_service_appointments(request):
         "core/my_service_appointments.html",
         {"appointments": appointments}
     )
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .models import Service, OwnedPet
+
 @login_required
 def appointment_page(request):
+    # Only adopter & owner allowed
+    if request.user.role not in ["adopter", "owner"]:
+        return redirect("home")
+
     services = Service.objects.filter(is_active=True)
-    pets = OwnedPet.objects.filter(owner=request.user)
+
+    pets = []
+    if request.user.role == "owner":
+        pets = OwnedPet.objects.filter(owner=request.user)
+
+    # adopter gets NO pets here (custom pet handled in template later)
 
     return render(
         request,
@@ -865,18 +885,7 @@ def appointment_page(request):
             "pets": pets,
         }
     )
-@login_required
-def appointment_page(request):
-    if request.user.role not in ["adopter", "owner"]:
-        return redirect("home")
 
-    pets = OwnedPet.objects.filter(owner=request.user)
-    services = Service.objects.filter(is_active=True)
-
-    return render(request, "core/appointment_page.html", {
-        "pets": pets,
-        "services": services,
-    })
 from .models import ChatRoom, ChatMessage
 
 

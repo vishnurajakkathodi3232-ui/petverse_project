@@ -2,6 +2,7 @@
 
 {% block title %}My Appointments | PetVerse{% endblock %}
 
+
 {% block content %}
 
 <style>
@@ -42,7 +43,9 @@
     }
 </style>
 
-<h2 class="mb-2">My Appointments 📅</h2>
+
+<h2 class="mb-2">Pet Service Appointments 📅</h2>
+
 <p class="text-muted">
     View service appointments booked for your pets.
 </p>
@@ -81,9 +84,14 @@
             </div>
 
             <div class="col-md-4 text-right">
-                <span class="status-badge status-upcoming">
-                    Upcoming
-                </span>
+                {% if appt.status == "completed" %}
+                    <span class="status-badge status-done">Completed</span>
+                {% else %}
+                    <span class="status-badge status-upcoming">
+                        {{ appt.status|capfirst }}
+                    </span>
+                {% endif %}
+
             </div>
         </div>
 

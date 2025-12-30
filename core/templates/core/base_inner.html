@@ -184,7 +184,7 @@
             </li>
 
             <li>
-                <a href="{% url 'chat' %}"
+                <a href="{% url 'chat_inbox' %}"
                    class="{% if request.resolver_match.url_name == 'chat' %}active{% endif %}">
                     <i class="fa fa-comments"></i> Chat
                 </a>
@@ -206,41 +206,56 @@
             </li>
         </ul>
         {% endif %}
+<!-- OWNER MENU -->
+{% if user.role == "owner" %}
 
-        <!-- OWNER MENU -->
-        {% if user.role == "owner" %}
+<h4>Owner</h4>
+<ul>
 
-        <h4>Owner</h4>
-        <ul>
-            <li>
-                <a href="{% url 'owner_pets' %}"
-                   class="{% if request.resolver_match.url_name == 'owner_pets' %}active{% endif %}">
-                    <i class="fa fa-paw"></i> My Pets
-                </a>
-            </li>
+    <!-- DASHBOARD -->
+    <li>
+        <a href="{% url 'owner_dashboard' %}"
+           class="{% if request.resolver_match.url_name == 'owner_dashboard' %}active{% endif %}">
+            <i class="fa fa-dashboard"></i> Dashboard
+        </a>
+    </li>
 
-            <li>
-                <a href="{% url 'owner_adoptions' %}"
-                   class="{% if request.resolver_match.url_name == 'owner_adoptions' %}active{% endif %}">
-                    <i class="fa fa-check-circle"></i> Requests
-                </a>
-            </li>
-            <li>
-    <a href="{% url 'owner_appointments' %}"
+    <!-- MY PETS -->
+    <li>
+        <a href="{% url 'owner_pets' %}"
+           class="{% if request.resolver_match.url_name == 'owner_pets' %}active{% endif %}">
+            <i class="fa fa-paw"></i> My Pets
+        </a>
+    </li>
+
+    <!-- ADOPTION REQUESTS -->
+    <li>
+        <a href="{% url 'owner_adoptions' %}"
+           class="{% if request.resolver_match.url_name == 'owner_adoptions' %}active{% endif %}">
+            <i class="fa fa-check-circle"></i> Requests
+        </a>
+    </li>
+
+    <!-- APPOINTMENTS -->
+    <li>
+        <a href="{% url 'owner_appointments' %}"
        class="{% if request.resolver_match.url_name == 'owner_appointments' %}active{% endif %}">
         <i class="fa fa-calendar"></i> Appointments
     </a>
-</li>
+    </li>
 
-            <li>
-                <a href="{% url 'chat' %}"
-                   class="{% if request.resolver_match.url_name == 'chat' %}active{% endif %}">
-                    <i class="fa fa-comments"></i> Chat
-                </a>
-            </li>
-        </ul>
-        {% endif %}
+    <!-- CHAT -->
+    <li>
+        <a href="{% url 'chat_inbox' %}"
+            class="{% if request.resolver_match.url_name == 'chat_inbox' %}active{% endif %}">
+            <i class="fa fa-comments"></i> Chat
+        </a>
 
+
+    </li>
+
+</ul>
+{% endif %}
         <!-- SHELTER MENU -->
         {% if user.role == "shelter" %}
         <h4>Shelter</h4>
