@@ -155,3 +155,5 @@ PETVERSE_ROLES = [
     ('shelter', 'Shelter'),
     ('admin', 'Admin'),
 ]
+# ============================
+# RAZORPAY CONFIGURATION

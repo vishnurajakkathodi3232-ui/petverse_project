@@ -250,7 +250,6 @@ class ChatMessage(models.Model):
     def __str__(self):
         return f"{self.sender.username}: {self.message[:20]}"
 
-
 class Payment(models.Model):
     PAYMENT_FOR_CHOICES = (
         ("appointment", "Appointment"),
@@ -271,7 +270,7 @@ class Payment(models.Model):
         related_name="payments_made"
     )
 
-    # Who receives money (for adoption only)
+    # Who receives money (used for adoption / future revenue split)
     receiver = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -296,6 +295,25 @@ class Payment(models.Model):
         default="pending"
     )
 
+    # 🔐 Razorpay fields (MANDATORY)
+    razorpay_order_id = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+
+    razorpay_payment_id = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+
+    razorpay_signature = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
+
     # Generic references (ONLY ONE will be filled)
     appointment = models.ForeignKey(
         "ServiceAppointment",
@@ -312,14 +330,12 @@ class Payment(models.Model):
     )
 
     order = models.ForeignKey(
-    "shop.Order",
-    on_delete=models.SET_NULL,
-    null=True,
-    blank=True,
-    related_name="core_payments"
-)
-
-    
+        "shop.Order",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="core_payments"
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 

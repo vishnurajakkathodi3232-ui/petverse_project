@@ -92,6 +92,7 @@ def make_appointment(request):
             appointment_date=date,
             appointment_time=time,
             notes=notes,
+            status="pending"
         )
 
 # 🔹 CREATE PAYMENT (AUTO)
@@ -108,7 +109,8 @@ def make_appointment(request):
             request,
             f"Appointment booked for {owned_pet.pet.name}."
         )
-        return redirect("home")
+        return redirect("appointment_payment_review", appointment.id)
+
 
     # ==================================================
     # CASE 2: Public Appointment (Old behavior)
@@ -955,3 +957,181 @@ def download_payment_receipt(request, payment_id):
         return redirect("dashboard")
 
     return generate_payment_receipt(payment)
+# core/views.py
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from decimal import Decimal
+
+from .models import ServiceAppointment
+from decimal import Decimal
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import ServiceAppointment
+
+@login_required
+def appointment_payment_review(request, appointment_id):
+    appointment = get_object_or_404(
+        ServiceAppointment,
+        id=appointment_id,
+        user=request.user
+    )
+
+    if appointment.status == "confirmed":
+        return redirect("adopter_appointments")
+
+    base_price = appointment.service.price
+    surcharge_amount = Decimal("0.00")
+
+    if request.user.role == "adopter":
+        surcharge_amount = base_price * Decimal("0.15")
+
+    final_amount = base_price + surcharge_amount
+
+    return render(
+        request,
+        "core/payment_review.html",
+        {
+            "appointment": appointment,
+            "base_price": base_price,
+            "surcharge_amount": surcharge_amount,
+            "final_amount": final_amount,
+            "surcharge_applied": surcharge_amount > 0,
+        }
+    )
+
+import razorpay
+from django.conf import settings
+from decimal import Decimal
+
+@login_required
+def appointment_payment_gateway(request, appointment_id):
+    appointment = get_object_or_404(
+        ServiceAppointment,
+        id=appointment_id,
+        user=request.user
+    )
+
+    payment = get_object_or_404(
+        Payment,
+        appointment=appointment,
+        status="pending"
+    )
+
+    base_price = appointment.service.price
+    amount = base_price
+
+    if request.user.role == "adopter":
+        amount = base_price + (base_price * Decimal("0.15"))
+
+    client = razorpay.Client(
+        auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
+    )
+
+    razorpay_order = client.order.create({
+        "amount": int(amount * 100),  # paise
+        "currency": "INR",
+        "payment_capture": 1,
+    })
+
+    payment.razorpay_order_id = razorpay_order["id"]
+    payment.amount = amount
+    payment.save()
+
+    return render(request, "core/appointments/payment_gateway.html", {
+        "appointment": appointment,
+        "payment": payment,
+        "razorpay_key": settings.RAZORPAY_KEY_ID,
+        "razorpay_order_id": razorpay_order["id"],
+        "amount": int(amount * 100),
+    })
+import razorpay
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib.auth.decorators import login_required
+
+from .models import Payment
+from .utils import send_appointment_payment_receipt
+
+
+
+@csrf_exempt
+@login_required
+def appointment_payment_success(request, payment_id):
+    """
+    Razorpay verified appointment payment success
+    """
+
+    if request.method != "POST":
+        return redirect("adopter_appointments")
+
+    payment = get_object_or_404(
+        Payment,
+        id=payment_id,
+        user=request.user,
+        payment_for="appointment"
+    )
+
+    appointment = payment.appointment
+
+    # Prevent duplicate processing
+    if appointment.status == "confirmed":
+        return redirect("adopter_appointments")
+
+    # Razorpay response values
+    razorpay_payment_id = request.POST.get("razorpay_payment_id")
+    razorpay_order_id = request.POST.get("razorpay_order_id")
+    razorpay_signature = request.POST.get("razorpay_signature")
+
+    # 🛑 Safety check
+    if razorpay_order_id != payment.razorpay_order_id:
+        payment.status = "failed"
+        payment.save()
+        return render(
+            request,
+            "core/appointments/payment_failed.html",
+            {"appointment": appointment}
+        )
+
+    # Razorpay client
+    client = razorpay.Client(
+        auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
+    )
+
+    try:
+        # 🔐 Signature verification
+        client.utility.verify_payment_signature({
+            "razorpay_payment_id": razorpay_payment_id,
+            "razorpay_order_id": razorpay_order_id,
+            "razorpay_signature": razorpay_signature
+        })
+    except razorpay.errors.SignatureVerificationError:
+        payment.status = "failed"
+        payment.save()
+
+        return render(
+            request,
+            "core/appointments/payment_failed.html",
+            {"appointment": appointment}
+        )
+
+    # ✅ VERIFIED PAYMENT
+    payment.status = "paid"
+    payment.payment_id = razorpay_payment_id
+    payment.save()
+
+    appointment.status = "confirmed"
+    appointment.save()
+
+    # 📧 SEND EMAIL RECEIPT
+    send_appointment_payment_receipt(payment)
+
+    return render(
+        request,
+        "core/payment_success.html",
+        {
+            "appointment": appointment,
+            "payment": payment
+        }
+    )

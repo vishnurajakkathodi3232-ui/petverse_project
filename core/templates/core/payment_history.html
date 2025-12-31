@@ -4,71 +4,131 @@
 
 {% block content %}
 
-<h2>Payment History 💰</h2>
-<p class="text-muted">View all your completed transactions.</p>
+<style>
+    .history-card {
+        background: #faf7f2;
+        border: 1px solid #e6dfd4;
+        border-radius: 12px;
+        padding: 22px;
+        margin-bottom: 25px;
+    }
 
-<hr>
+    .history-title {
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
 
-<!-- PAYMENTS MADE -->
-<h4>Payments Made</h4>
+    .amount {
+        font-weight: 600;
+        color: #2e8b57;
+    }
 
-{% if payments_made %}
-<div class="table-responsive">
-    <table class="table table-striped table-bordered">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for p in payments_made %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ p.payment_for|title }}</td>
-                <td>₹ {{ p.amount }}</td>
-                <td>{{ p.created_at|date:"M d, Y" }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    .badge-paid {
+        background: #e8f6ec;
+        color: #2e8b57;
+        padding: 4px 10px;
+        border-radius: 14px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+</style>
+
+<div class="container">
+
+    <h2 class="mb-2">Payment History 💰</h2>
+    <p class="text-muted">
+        View all your completed transactions and earnings.
+    </p>
+
+    <hr>
+
+    <!-- ================= PAYMENTS MADE ================= -->
+    <div class="history-card">
+        <h4 class="history-title">
+            <i class="fa fa-arrow-up"></i> Payments Made
+        </h4>
+
+        {% if payments_made %}
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Purpose</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payments_made %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ p.payment_for|title }}</td>
+                        <td class="amount">₹ {{ p.amount }}</td>
+                        <td>{{ p.created_at|date:"d M Y" }}</td>
+                        <td>
+                            <span class="badge-paid">Paid</span>
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'download_payment_receipt' p.id %}"
+                               class="btn btn-xs btn-success">
+                                <i class="fa fa-file-pdf-o"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <div class="alert alert-info">
+                You haven’t made any payments yet.
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- ================= PAYMENTS RECEIVED ================= -->
+    {% if payments_received %}
+    <div class="history-card">
+        <h4 class="history-title">
+            <i class="fa fa-arrow-down"></i> Payments Received
+        </h4>
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>From</th>
+                        <th>Purpose</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payments_received %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ p.user.username }}</td>
+                        <td>{{ p.payment_for|title }}</td>
+                        <td class="amount">₹ {{ p.amount }}</td>
+                        <td>{{ p.created_at|date:"d M Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="text-right mt-3">
+        <a href="{% url 'dashboard' %}" class="btn btn-default">
+            ← Back to Dashboard
+        </a>
+    </div>
+
 </div>
-{% else %}
-<div class="alert alert-info">
-    No payments made yet.
-</div>
-{% endif %}
-
-{% if payments_received %}
-<hr>
-
-<!-- PAYMENTS RECEIVED -->
-<h4>Payments Received</h4>
-
-<div class="table-responsive">
-    <table class="table table-striped table-bordered">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>From</th>
-                <th>Amount</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for p in payments_received %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ p.user.username }}</td>
-                <td>₹ {{ p.amount }}</td>
-                <td>{{ p.created_at|date:"M d, Y" }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-{% endif %}
 
 {% endblock %}

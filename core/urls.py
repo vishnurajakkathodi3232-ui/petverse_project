@@ -81,15 +81,13 @@ urlpatterns = [
     path("payments/<int:payment_id>/review/", views.payment_review, name="payment_review"),
     path("payments/<int:payment_id>/success/",views.payment_success,name="payment_success"),
     path("payments/history/",views.payment_history,name="payment_history"),
-
-
-
-   
-
-
     
+    # Appointment Payments
+    path("appointment/payment/review/<int:appointment_id>/",views.appointment_payment_review,name="appointment_payment_review"),
 
+    path("appointment/payment/<int:appointment_id>/",views.appointment_payment_gateway,name="appointment_payment_gateway"),
 
+    path("appointment/payment/success/<int:payment_id>/",views.appointment_payment_success,name="appointment_payment_success"),
 
 
 ]

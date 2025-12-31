@@ -1,0 +1,89 @@
+{% extends "core/base_inner.html" %}
+
+{% block title %}Payment Failed | PetVerse{% endblock %}
+
+{% block content %}
+
+<style>
+    .fail-card {
+        background: #fff5f5;
+        border: 1px solid #f2c2c2;
+        border-radius: 14px;
+        padding: 30px;
+        max-width: 520px;
+        margin: auto;
+    }
+
+    .icon {
+        font-size: 52px;
+        color: #c0392b;
+    }
+
+    .muted {
+        font-size: 13px;
+        color: #777;
+    }
+</style>
+
+<div class="container" style="margin-top:120px;">
+
+    <div class="fail-card text-center">
+
+        <div class="icon mb-3">
+            <i class="fa fa-times-circle"></i>
+        </div>
+
+        <h3 class="mb-2 text-danger">
+            Payment Failed
+        </h3>
+
+        <p class="text-muted">
+            Your payment could not be completed.
+        </p>
+
+        <hr>
+
+        <p>
+            <strong>Pet:</strong> {{ appointment.owned_pet.pet.name }}
+        </p>
+
+        <p>
+            <strong>Service:</strong> {{ appointment.service.name }}
+        </p>
+
+        <p>
+            <strong>Amount:</strong> ₹ {{ payment.amount }}
+        </p>
+
+        <hr>
+
+        <p class="muted">
+            ❗ No amount has been confirmed as paid.<br>
+            Your appointment is still <strong>pending</strong>.
+        </p>
+
+        <div class="mt-4">
+
+            <a href="{% url 'appointment_payment_gateway' appointment.id %}"
+               class="btn btn-warning btn-lg">
+                Retry Payment
+            </a>
+
+        </div>
+
+        <div class="mt-3">
+            <a href="{% url 'adopter_appointments' %}"
+               class="btn btn-link">
+                Go to My Appointments
+            </a>
+        </div>
+
+        <p class="muted mt-3">
+            If money was debited, it will be auto-refunded by Razorpay.
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}
