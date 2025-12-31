@@ -1,26 +1,48 @@
 from django.shortcuts import render
 from .models import Product, ProductCategory
 
+from django.db.models import Q
+from django.shortcuts import render
+from .models import Product, ProductCategory
+import razorpay
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+
 
 def product_list(request):
-    """
-    Public product listing page.
-    Shows only active products under active categories.
-    """
-
     categories = ProductCategory.objects.filter(is_active=True)
+
+    # Get filters from URL
+    search_query = request.GET.get("q", "")
+    category_id = request.GET.get("category")
 
     products = Product.objects.filter(
         is_active=True,
         category__is_active=True
-    ).select_related('category')
+    )
+
+    # Search filter
+    if search_query:
+        products = products.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+
+    # Category filter
+    if category_id:
+        products = products.filter(category_id=category_id)
+
+    products = products.select_related("category")
 
     context = {
-        'categories': categories,
-        'products': products,
+        "categories": categories,
+        "products": products,
+        "search_query": search_query,
+        "active_category": category_id,
     }
 
-    return render(request, 'shop/product_list.html', context)
+    return render(request, "shop/product_list.html", context)
+
 from django.shortcuts import render, get_object_or_404
 from .models import Product
 
@@ -128,7 +150,6 @@ def cart_detail(request):
 from django.contrib.auth.decorators import login_required
 from .models import Order, OrderItem
 
-
 @login_required
 def checkout(request):
     """
@@ -139,7 +160,6 @@ def checkout(request):
     cart = request.session.get('cart')
 
     if not cart:
-        # No cart → redirect safely
         return redirect('shop:cart_detail')
 
     total_amount = 0
@@ -179,18 +199,20 @@ def checkout(request):
         'order': order,
     }
 
-    return render(request, 'shop/checkout_success.html', context)
+    return redirect('shop:payment_page', order_id=order.id)
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Order, Payment
+import razorpay
+from django.conf import settings
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Order
 
 
 @login_required
 def payment_page(request, order_id):
-    """
-    Displays payment page (mock gateway).
-    """
-
     order = get_object_or_404(
         Order,
         id=order_id,
@@ -198,24 +220,44 @@ def payment_page(request, order_id):
         status='pending'
     )
 
-    # Create payment record if not exists
-    payment, created = Payment.objects.get_or_create(
-        order=order,
-        defaults={'status': 'initiated'}
+    # Razorpay client
+    client = razorpay.Client(
+        auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
     )
 
+    # Create Razorpay order (amount in paise)
+    razorpay_order = client.order.create({
+        "amount": int(order.total_amount * 100),  # ₹ → paise
+        "currency": "INR",
+        "payment_capture": 1
+    })
+
     context = {
-        'order': order,
-        'payment': payment,
+        "order": order,
+        "razorpay_order_id": razorpay_order["id"],
+        "razorpay_key": settings.RAZORPAY_KEY_ID,
+        "amount": order.total_amount,
+        "currency": "INR",
     }
 
-    return render(request, 'shop/payment.html', context)
+    return render(request, "shop/payment.html", context)
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
+
+from .models import Order, Payment
 
 
+from .utils_email import send_order_invoice_email
+from django.shortcuts import get_object_or_404, render
+from django.contrib.auth.decorators import login_required
+from .models import Order, Payment
+@csrf_exempt  # Razorpay may POST here later
 @login_required
 def payment_success(request, order_id):
     """
-    Mock payment success callback.
+    Razorpay payment success (safe client-side confirmation)
     """
 
     order = get_object_or_404(
@@ -224,17 +266,32 @@ def payment_success(request, order_id):
         user=request.user
     )
 
-    payment = get_object_or_404(Payment, order=order)
+    # Prevent duplicate processing
+    if order.status == "paid":
+        return render(request, "shop/payment_success.html", {"order": order})
 
-    # Update payment & order status
-    payment.status = 'success'
-    payment.payment_id = f"MOCKPAY-{order.id}"
-    payment.save()
+    # Create or update payment safely
+    payment, created = Payment.objects.get_or_create(
+        order=order,
+        defaults={
+            "status": "paid",
+            "payment_id": "RAZORPAY_TEST"
+        }
+    )
 
-    order.status = 'paid'
+    if not created:
+        payment.status = "paid"
+        payment.save()
+
+    # Mark order as paid
+    order.status = "paid"
     order.save()
 
-    return render(request, 'shop/payment_success.html', {'order': order})
+    # 📧 Send invoice email (SAFE MODE)
+    send_order_invoice_email(order)
+
+    return render(request, "shop/payment_success.html", {"order": order})
+
 from django.contrib.auth.decorators import login_required
 from .models import Order
 
@@ -254,3 +311,31 @@ def my_orders(request):
     }
 
     return render(request, 'shop/my_orders.html', context)
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseForbidden
+
+from .models import Order
+from .utils import generate_invoice_pdf
+
+
+@login_required
+def download_invoice(request, order_id):
+    """
+    Allows user to download invoice PDF
+    Only for PAID orders
+    Only order owner can access
+    """
+
+    order = get_object_or_404(
+        Order,
+        id=order_id,
+        user=request.user
+    )
+
+    # Allow invoice only for paid orders
+    if order.status != "paid":
+        return HttpResponseForbidden("Invoice available only after payment.")
+
+    return generate_invoice_pdf(order)

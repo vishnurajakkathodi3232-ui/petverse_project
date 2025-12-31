@@ -1,27 +1,58 @@
 {% extends "core/base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="container" style="margin-top: 140px; max-width: 600px;">
+<div class="container" style="margin-top:140px; max-width:700px;">
 
-    <div class="card">
+    <div class="card shadow-sm">
         <div class="card-body text-center">
 
-            <h2 class="text-success mb-3">Payment Successful ✅</h2>
+            <h2 class="text-success mb-3">
+                <i class="fa fa-check-circle"></i>
+                Payment Successful
+            </h2>
 
-            <p>
-                <strong>Order ID:</strong> #{{ order.id }}
+            <p class="text-muted">
+                Thank you for shopping with <strong>PetVerse</strong>
             </p>
 
-            <p>
-                <strong>Amount Paid:</strong> ₹ {{ order.total_amount }}
+            <hr>
+
+            <div class="row text-left">
+                <div class="col-md-6">
+                    <p>
+                        <strong>Order ID:</strong><br>
+                        #{{ order.id }}
+                    </p>
+                </div>
+
+                <div class="col-md-6 text-right">
+                    <p>
+                        <strong>Total Paid:</strong><br>
+                        ₹ {{ order.total_amount }}
+                    </p>
+                </div>
+            </div>
+
+            <hr>
+
+            <p class="text-muted">
+                Your order has been confirmed and is being processed.
             </p>
 
-            <p class="text-muted mt-3">
-                Your order has been confirmed.
-            </p>
+            <!-- FUTURE AREA (DO NOT REMOVE) -->
+            <div class="alert alert-info mt-4">
+                📄 Invoice & receipt will be sent to your registered email.<br>
+                (PDF download will be enabled soon)
+            </div>
 
             <div class="mt-4">
-                <a href="{% url 'shop:product_list' %}" class="btn btn-primary">
+                <a href="{% url 'shop:my_orders' %}" class="btn btn-default">
+                    View My Orders
+                </a>
+
+                <a href="{% url 'shop:product_list' %}"
+                   class="btn btn-primary">
                     Continue Shopping
                 </a>
             </div>

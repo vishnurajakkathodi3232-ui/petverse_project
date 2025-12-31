@@ -2,54 +2,139 @@
 {% load static %}
 
 {% block content %}
-<div class="container" style="margin-top: 140px;">
+<style>
+    .cart-wrapper {
+        background: #faf7f2; /* pale brown */
+        border: 1px solid #e6dfd4;
+        border-radius: 12px;
+        padding: 25px;
+    }
 
-    <h2 class="mb-4">Your Cart</h2>
+    .cart-table th {
+        background: #f1ece4;
+        border-bottom: 2px solid #ddd;
+    }
+
+    .cart-table td,
+    .cart-table th {
+        vertical-align: middle;
+    }
+
+    .summary-box {
+        background: #ffffff;
+        border: 1px dashed #d8d1c5;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .total-amount {
+        font-size: 22px;
+        font-weight: 700;
+        color: #2e8b57;
+    }
+</style>
+
+<div class="container" style="margin-top:140px;">
+
+    <h2 class="mb-4">
+        <i class="fa fa-shopping-cart"></i> Your Cart
+    </h2>
 
     {% if cart_items %}
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Subtotal</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in cart_items %}
+    <div class="cart-wrapper">
+
+        <!-- CART TABLE -->
+        <div class="table-responsive">
+            <table class="table table-bordered cart-table">
+                <thead>
                     <tr>
-                        <td>{{ item.name }}</td>
-                        <td>₹ {{ item.price }}</td>
-                        <td>{{ item.quantity }}</td>
-                        <td>₹ {{ item.subtotal }}</td>
+                        <th>Product</th>
+                        <th width="120">Price</th>
+                        <th width="100">Qty</th>
+                        <th width="140">Subtotal</th>
+                        <th width="80"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
                         <td>
+                            <strong>{{ item.name }}</strong>
+                        </td>
+
+                        <td>₹ {{ item.price }}</td>
+
+                        <td>{{ item.quantity }}</td>
+
+                        <td>
+                            <strong>₹ {{ item.subtotal }}</strong>
+                        </td>
+
+                        <td class="text-center">
                             <a href="{% url 'shop:cart_remove' item.product_id %}"
-                               class="btn btn-sm btn-danger">
-                                Remove
+                               class="btn btn-xs btn-danger">
+                                <i class="fa fa-trash"></i>
                             </a>
                         </td>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <div class="text-right">
-            <h4>Total: ₹ {{ total_amount }}</h4>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 
-        <hr>
+        <!-- SUMMARY -->
+        <div class="row">
+            <div class="col-md-6">
+                <a href="{% url 'shop:product_list' %}"
+                   class="btn btn-default">
+                    ← Continue Shopping
+                </a>
+            </div>
 
-        <!-- Checkout / Payment placeholder -->
-        <div class="text-right">
-            <button class="btn btn-primary" disabled>
-                Proceed to Payment (Coming Soon)
-            </button>
+            <div class="col-md-6">
+                <div class="summary-box text-right">
+                    <p class="text-muted mb-1">
+                        Order Total
+                    </p>
+                    <div class="total-amount">
+                        ₹ {{ total_amount }}
+                    </div>
+
+                    <hr>
+
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'shop:checkout' %}"
+                           class="btn btn-success">
+                            Proceed to Checkout
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login' %}?next={% url 'shop:cart_detail' %}"
+                           class="btn btn-primary">
+                            Login to Checkout
+                        </a>
+                    {% endif %}
+
+                    <p class="text-muted mt-2" style="font-size:12px;">
+                        Secure payment & invoice generated after checkout.
+                    </p>
+                </div>
+            </div>
         </div>
 
+    </div>
     {% else %}
-        <p>Your cart is empty.</p>
+
+        <div class="alert alert-info">
+            <strong>Your cart is empty.</strong><br>
+            Browse products and add items to your cart.
+        </div>
+
+        <a href="{% url 'shop:product_list' %}"
+           class="btn btn-primary">
+            Browse Products
+        </a>
+
     {% endif %}
 
 </div>
