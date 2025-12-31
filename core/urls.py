@@ -75,7 +75,7 @@ urlpatterns = [
     path("superadmin/adoptions/<int:pk>/approve/",views.admin_approve_adoption,name="admin_approve_adoption"),
     path("superadmin/adoptions/<int:pk>/reject/",views.admin_reject_adoption,name="admin_reject_adoption"),
     path("my-services/",views.my_service_appointments,name="my_service_appointments"),
-    path("appointments/book/", views.appointment_page, name="appointment_page"),
+   
     path("chat/<int:req_id>/", views.chat_room, name="chat_room"),
     path("chat/", views.chat_inbox, name="chat_inbox"),
     path("payments/<int:payment_id>/review/", views.payment_review, name="payment_review"),
@@ -88,6 +88,9 @@ urlpatterns = [
     path("appointment/payment/<int:appointment_id>/",views.appointment_payment_gateway,name="appointment_payment_gateway"),
 
     path("appointment/payment/success/<int:payment_id>/",views.appointment_payment_success,name="appointment_payment_success"),
+    # Payment related
+    path("payments/receipt/<int:payment_id>/",views.download_payment_receipt,name="download_payment_receipt"),
+
 
 
 ]

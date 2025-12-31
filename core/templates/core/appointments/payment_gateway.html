@@ -66,21 +66,11 @@
 
         <!-- AMOUNT -->
         <div class="amount-box">
+        <p class="muted mb-1">
+            Payable Amount
+        </p>
 
-            <p class="muted mb-1">
-                Base Price
-            </p>
             <strong>₹ {{ appointment.service.price }}</strong>
-
-            {% if payment.amount > appointment.service.price %}
-                <hr>
-                <p class="muted mb-1">
-                    Adopter Service Fee (15%)
-                </p>
-                <strong>
-                    ₹ {{ payment.amount|floatformat:2|add:"-"|add:appointment.service.price }}
-                </strong>
-            {% endif %}
 
             <hr>
 
