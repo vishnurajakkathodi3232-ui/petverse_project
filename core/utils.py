@@ -82,13 +82,7 @@ def generate_payment_receipt(payment):
 
 from django.core.mail import send_mail
 from django.conf import settings
-
-
 def send_appointment_payment_receipt(payment):
-    """
-    Sends appointment payment confirmation email
-    """
-
     subject = "PetVerse – Appointment Payment Successful"
 
     message = f"""
@@ -109,5 +103,5 @@ Thank you for choosing PetVerse 🐾
         message=message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[payment.user.email],
-        fail_silently=True  # IMPORTANT for demo safety
+        fail_silently=False
     )

@@ -1,18 +1,29 @@
-{% extends "core/base.html" %}
+{% extends "core/base_inner.html" %}
 {% load static %}
 
+{% block title %}My Cart | PetVerse{% endblock %}
+
 {% block content %}
+
 <style>
-    .cart-wrapper {
-        background: #faf7f2; /* pale brown */
-        border: 1px solid #e6dfd4;
-        border-radius: 12px;
-        padding: 25px;
+    .cart-card {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 28px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+
+    .cart-title {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 20px;
     }
 
     .cart-table th {
-        background: #f1ece4;
-        border-bottom: 2px solid #ddd;
+        background: #f1f5f9;
+        border-bottom: 2px solid #e5e7eb;
+        font-weight: 600;
+        font-size: 14px;
     }
 
     .cart-table td,
@@ -20,33 +31,69 @@
         vertical-align: middle;
     }
 
-    .summary-box {
-        background: #ffffff;
-        border: 1px dashed #d8d1c5;
-        border-radius: 10px;
-        padding: 20px;
-        margin-top: 20px;
+    .cart-table td {
+        font-size: 14px;
     }
 
-    .total-amount {
-        font-size: 22px;
+    .remove-btn {
+        background: #fee2e2;
+        color: #b91c1c;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 6px;
+    }
+
+    .remove-btn:hover {
+        background: #fecaca;
+    }
+
+    .summary-card {
+        background: #f8fafc;
+        border-radius: 14px;
+        padding: 24px;
+        border: 1px dashed #d1d5db;
+    }
+
+    .summary-label {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .summary-total {
+        font-size: 26px;
         font-weight: 700;
-        color: #2e8b57;
+        color: #15803d;
+        margin: 10px 0;
+    }
+
+    .empty-cart {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+
+    .empty-cart i {
+        font-size: 42px;
+        color: #9ca3af;
+        margin-bottom: 10px;
     }
 </style>
 
-<div class="container" style="margin-top:140px;">
+<div class="container-fluid">
 
-    <h2 class="mb-4">
-        <i class="fa fa-shopping-cart"></i> Your Cart
+    <h2 class="cart-title">
+        <i class="fa fa-shopping-cart"></i> My Cart
     </h2>
 
     {% if cart_items %}
-    <div class="cart-wrapper">
+
+    <div class="cart-card">
 
         <!-- CART TABLE -->
         <div class="table-responsive">
-            <table class="table table-bordered cart-table">
+            <table class="table cart-table">
                 <thead>
                     <tr>
                         <th>Product</th>
@@ -73,7 +120,7 @@
 
                         <td class="text-center">
                             <a href="{% url 'shop:cart_remove' item.product_id %}"
-                               class="btn btn-xs btn-danger">
+                               class="remove-btn">
                                 <i class="fa fa-trash"></i>
                             </a>
                         </td>
@@ -83,9 +130,11 @@
             </table>
         </div>
 
+        <hr>
+
         <!-- SUMMARY -->
-        <div class="row">
-            <div class="col-md-6">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-3 mb-md-0">
                 <a href="{% url 'shop:product_list' %}"
                    class="btn btn-default">
                     ← Continue Shopping
@@ -93,49 +142,56 @@
             </div>
 
             <div class="col-md-6">
-                <div class="summary-box text-right">
-                    <p class="text-muted mb-1">
+                <div class="summary-card text-right">
+
+                    <div class="summary-label">
                         Order Total
-                    </p>
-                    <div class="total-amount">
+                    </div>
+
+                    <div class="summary-total">
                         ₹ {{ total_amount }}
                     </div>
 
-                    <hr>
-
                     {% if user.is_authenticated %}
                         <a href="{% url 'shop:checkout' %}"
-                           class="btn btn-success">
+                           class="btn btn-success btn-lg">
                             Proceed to Checkout
                         </a>
                     {% else %}
                         <a href="{% url 'login' %}?next={% url 'shop:cart_detail' %}"
-                           class="btn btn-primary">
+                           class="btn btn-primary btn-lg">
                             Login to Checkout
                         </a>
                     {% endif %}
 
                     <p class="text-muted mt-2" style="font-size:12px;">
-                        Secure payment & invoice generated after checkout.
+                        Secure checkout • Invoice generated after payment
                     </p>
+
                 </div>
             </div>
         </div>
 
     </div>
+
     {% else %}
 
-        <div class="alert alert-info">
-            <strong>Your cart is empty.</strong><br>
+    <!-- EMPTY CART -->
+    <div class="empty-cart">
+        <i class="fa fa-shopping-cart"></i>
+        <h4>Your cart is empty</h4>
+        <p class="text-muted">
             Browse products and add items to your cart.
-        </div>
+        </p>
 
         <a href="{% url 'shop:product_list' %}"
-           class="btn btn-primary">
+           class="btn btn-primary btn-lg">
             Browse Products
         </a>
+    </div>
 
     {% endif %}
 
 </div>
+
 {% endblock %}

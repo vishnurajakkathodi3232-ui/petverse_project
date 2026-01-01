@@ -129,13 +129,36 @@ def make_appointment(request):
 
 # AUTH
 # ======================================================
-
 def signup(request):
     if request.method == "POST":
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        # ✅ CHECK DUPLICATE USERNAME
+        if User.objects.filter(username=username).exists():
+            return render(
+                request,
+                "core/signup.html",
+                {
+                    "error": "Username already exists. Please choose another one."
+                }
+            )
+
+        # (Optional but recommended)
+        if User.objects.filter(email=email).exists():
+            return render(
+                request,
+                "core/signup.html",
+                {
+                    "error": "Email already registered. Please log in."
+                }
+            )
+
         user = User.objects.create_user(
-            username=request.POST.get("username"),
-            email=request.POST.get("email"),
-            password=request.POST.get("password"),
+            username=username,
+            email=email,
+            password=password,
         )
 
         user.first_name = request.POST.get("full_name", "")
@@ -268,11 +291,13 @@ def send_adoption_request(request, pet_id):
 # OWNER
 # ======================================================
 
+
 @login_required
 def owner_dashboard(request):
-    if not OwnedPet.objects.filter(owner=request.user).exists():
+    if request.user.role != "owner":
         return redirect("home")
     return render(request, "core/dashboard_owner.html")
+
 
 
 @login_required
@@ -474,7 +499,7 @@ def adopter_appointments(request):
 # ---------- OWNER ----------
 @login_required
 def owner_add_pet(request):
-    if not getattr(request.user, "has_pet", False):
+    if request.user.role != "owner":
         return redirect("home")
 
     if request.method == "POST":
@@ -504,7 +529,6 @@ def owner_add_pet(request):
         return redirect("owner_pets")
 
     return render(request, "core/owner_add_pet.html")
-
 
 @login_required
 def owner_adoptions(request):

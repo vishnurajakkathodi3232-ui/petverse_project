@@ -296,6 +296,32 @@
             </li>
         </ul>
         {% endif %}
+        <h4>Shop</h4>
+<ul>
+
+    <li>
+        <a href="{% url 'shop:product_list' %}"
+           class="{% if request.resolver_match.url_name == 'product_list' %}active{% endif %}">
+            <i class="fa fa-store"></i> Shop
+        </a>
+    </li>
+
+    <li>
+        <a href="{% url 'shop:cart_detail' %}"
+           class="{% if request.resolver_match.url_name == 'cart_detail' %}active{% endif %}">
+            <i class="fa fa-shopping-cart"></i> Cart
+        </a>
+    </li>
+
+    <li>
+        <a href="{% url 'shop:my_orders' %}"
+           class="{% if request.resolver_match.url_name == 'my_orders' %}active{% endif %}">
+            <i class="fa fa-box"></i> My Orders
+        </a>
+    </li>
+
+</ul>
+
 
     </aside>
 
