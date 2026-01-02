@@ -1,43 +1,218 @@
 {% extends "core/admin/base_admin.html" %}
 
-
 {% block title %}Super Admin Dashboard{% endblock %}
 
 {% block content %}
 
 <h2>Dashboard</h2>
-<p class="text-muted">System overview</p>
+<p class="text-muted">System overview (read-only)</p>
+
+<hr>
+
+<!-- ================= USERS ================= -->
+<h4>Users</h4>
+<div class="row">
+    <div class="col-md-3">
+        <a href="{% url 'admin_users' %}" style="text-decoration:none;">
+            <div class="stat-card">
+                <span>Total Users</span>
+                <h3>{{ total_users }}</h3>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'admin_users' %}" style="text-decoration:none;">
+            <div class="stat-card">
+                <span>Shelters</span>
+                <h3>{{ shelters }}</h3>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'admin_users' %}" style="text-decoration:none;">
+            <div class="stat-card">
+                <span>Owners</span>
+                <h3>{{ owners }}</h3>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'admin_users' %}" style="text-decoration:none;">
+            <div class="stat-card">
+                <span>Adopters</span>
+                <h3>{{ adopters }}</h3>
+            </div>
+        </a>
+    </div>
+</div>
+
+<hr>
+
+<!-- ================= PETS & ADOPTIONS ================= -->
+<h4>Pets & Adoptions</h4>
+<div class="row">
+    <div class="col-md-3">
+        <a href="{% url 'admin_pets' %}" style="text-decoration:none;">
+            <div class="stat-card">
+                <span>Total Pets</span>
+                <h3>{{ total_pets }}</h3>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'admin_pets' %}" style="text-decoration:none;">
+            <div class="stat-card">
+                <span>Available Pets</span>
+                <h3>{{ available_pets }}</h3>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'admin_adoptions' %}" style="text-decoration:none;">
+            <div class="stat-card">
+                <span>Adoption Requests</span>
+                <h3>{{ total_adoption_requests }}</h3>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'admin_adoptions' %}" style="text-decoration:none;">
+            <div class="stat-card">
+                <span>Approved Adoptions</span>
+                <h3>{{ approved_adoptions }}</h3>
+            </div>
+        </a>
+    </div>
+</div>
+
+<hr>
+
+<!-- ================= APPOINTMENTS ================= -->
+<h4>Appointments</h4>
+<div class="row">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <span>Total Appointments</span>
+            <h3>{{ total_appointments }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <span>Pending</span>
+            <h3>{{ pending_appointments }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <span>Confirmed</span>
+            <h3>{{ confirmed_appointments }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <span>Completed</span>
+            <h3>{{ completed_appointments }}</h3>
+        </div>
+    </div>
+</div>
 
 <div class="row">
-
     <div class="col-md-3">
         <div class="stat-card">
-            <span>Total Users</span>
-            <h3>{{ total_users }}</h3>
+            <span>Appointment Revenue</span>
+            <h3>₹ {{ appointment_revenue }}</h3>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ================= SHOP ================= -->
+<h4>Shop</h4>
+<div class="row">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <span>Total Products</span>
+            <h3>{{ total_products }}</h3>
         </div>
     </div>
 
     <div class="col-md-3">
         <div class="stat-card">
-            <span>Total Pets</span>
-            <h3>{{ total_pets }}</h3>
+            <span>Active Products</span>
+            <h3>{{ active_products }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'superadmin_orders' %}" style="text-decoration:none;">
+            <div class="stat-card">
+                <span>Total Orders</span>
+                <h3>{{ total_orders }}</h3>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'superadmin_orders' %}" style="text-decoration:none;">
+            <div class="stat-card">
+                <span>Paid Orders</span>
+                <h3>{{ paid_orders }}</h3>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <span>Shop Revenue</span>
+            <h3>₹ {{ shop_revenue }}</h3>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ================= PAYMENTS ================= -->
+<h4>Payments</h4>
+<div class="row">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <span>Total Payments</span>
+            <h3>{{ total_payments }}</h3>
         </div>
     </div>
 
     <div class="col-md-3">
         <div class="stat-card">
-            <span>Adoption Requests</span>
-            <h3>{{ total_requests }}</h3>
+            <span>Successful</span>
+            <h3>{{ successful_payments }}</h3>
         </div>
     </div>
 
     <div class="col-md-3">
         <div class="stat-card">
-            <span>Orders</span>
-            <h3>0</h3>
+            <span>Failed</span>
+            <h3>{{ failed_payments }}</h3>
         </div>
     </div>
 
+    <div class="col-md-3">
+        <div class="stat-card">
+            <span>Total Revenue</span>
+            <h3>₹ {{ total_revenue }}</h3>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

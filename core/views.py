@@ -45,17 +45,17 @@ from django.contrib import messages
 from .models import Appointment, ServiceAppointment, Service, OwnedPet
 from .models import OwnedPet, AdoptionRequest, Service
 
-
+@login_required
 def make_appointment(request):
     if request.method != "POST":
         return redirect("home")
 
     # ==================================================
-    # CASE 1: Logged-in user → Service Appointment
+    # LOGGED-IN USERS (OWNER + SHELTER)
     # ==================================================
     if request.user.is_authenticated:
 
-        if request.user.role not in ["adopter", "owner"]:
+        if request.user.role not in ["owner", "shelter"]:
             messages.error(request, "You are not allowed to book services.")
             return redirect("home")
 
@@ -65,26 +65,45 @@ def make_appointment(request):
         time = request.POST.get("time")
         notes = request.POST.get("message", "")
 
-        # Basic validation
         if not pet_id or not service_id or not date or not time:
             messages.error(request, "Please fill all required fields.")
             return redirect(request.META.get("HTTP_REFERER", "home"))
 
-        # Ownership validation (STRICT)
-        owned_pet = get_object_or_404(
-            OwnedPet,
-            id=pet_id,
-            owner=request.user
-        )
-
-        # Active service validation
         service = get_object_or_404(
             Service,
             id=service_id,
             is_active=True
         )
 
-        # ✅ SAVE (now safe)
+        # ==========================
+        # OWNER FLOW (UNCHANGED)
+        # ==========================
+        if request.user.role == "owner":
+            owned_pet = get_object_or_404(
+                OwnedPet,
+                id=pet_id,
+                owner=request.user
+            )
+
+        # ==========================
+        # SHELTER FLOW (NEW)
+        # ==========================
+        else:  # shelter
+            shelter_pet = get_object_or_404(
+                Pet,
+                id=pet_id,
+                added_by=request.user
+            )
+
+            # Create or reuse OwnedPet
+            owned_pet, created = OwnedPet.objects.get_or_create(
+                owner=request.user,
+                pet=shelter_pet
+            )
+
+        # ==========================
+        # CREATE APPOINTMENT
+        # ==========================
         appointment = ServiceAppointment.objects.create(
             user=request.user,
             owned_pet=owned_pet,
@@ -95,7 +114,9 @@ def make_appointment(request):
             status="pending"
         )
 
-# 🔹 CREATE PAYMENT (AUTO)
+        # ==========================
+        # CREATE PAYMENT
+        # ==========================
         Payment.objects.create(
             user=request.user,
             payment_for="appointment",
@@ -104,16 +125,15 @@ def make_appointment(request):
             status="pending"
         )
 
-
         messages.success(
             request,
             f"Appointment booked for {owned_pet.pet.name}."
         )
+
         return redirect("appointment_payment_review", appointment.id)
 
-
     # ==================================================
-    # CASE 2: Public Appointment (Old behavior)
+    # PUBLIC APPOINTMENT (OLD FLOW)
     # ==================================================
     Appointment.objects.create(
         name=request.POST.get("name"),
@@ -340,6 +360,35 @@ def shelter_dashboard(request):
         return redirect("home")
     return render(request, "core/dashboard_shelter.html")
 
+# =========================
+# SHELTER APPOINTMENTS
+# =========================
+from django.contrib.auth.decorators import login_required
+from .models import ServiceAppointment
+
+
+@login_required
+def shelter_appointments(request):
+    if request.user.role != "shelter":
+        return redirect("home")
+
+    appointments = ServiceAppointment.objects.filter(
+        owned_pet__pet__added_by=request.user
+    ).select_related(
+        "owned_pet__pet",
+        "service",
+        "user"
+    ).order_by("-appointment_date", "-appointment_time")
+
+    context = {
+        "appointments": appointments
+    }
+
+    return render(
+        request,
+        "core/shelter_appointments.html",
+        context
+    )
 
 @login_required
 def shelter_pets(request):
@@ -366,18 +415,127 @@ def shelter_add_pet(request):
 # ======================================================
 # ADMIN (SUPER ADMIN)
 # ======================================================
+# ======================================================
+# ADMIN (SUPER ADMIN) – EXTENDED SYSTEM OVERVIEW
+# ======================================================
+
+from django.db.models import Count, Sum
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+
+from .models import (
+    Pet,
+    AdoptionRequest,
+    ServiceAppointment,
+    Payment
+)
+
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+# Shop models
+from shop.models import Product, Order
+
 
 @login_required
 def superadmin_dashboard(request):
     if not request.user.is_superuser:
         return redirect("home")
 
-    return render(request, "core/admin/dashboard.html", {
-        "total_users": User.objects.count(),
-        "total_pets": Pet.objects.count(),
-        "total_requests": AdoptionRequest.objects.count(),
-    })
+    # =========================
+    # USERS
+    # =========================
+    total_users = User.objects.count()
+    shelters = User.objects.filter(role="shelter").count()
+    owners = User.objects.filter(role="owner").count()
+    adopters = User.objects.filter(role="adopter").count()
 
+    # =========================
+    # PETS & ADOPTIONS
+    # =========================
+    total_pets = Pet.objects.count()
+    available_pets = Pet.objects.filter(is_available=True).count()
+
+    total_adoption_requests = AdoptionRequest.objects.count()
+    approved_adoptions = AdoptionRequest.objects.filter(status="approved").count()
+
+    # =========================
+    # APPOINTMENTS
+    # =========================
+    total_appointments = ServiceAppointment.objects.count()
+    pending_appointments = ServiceAppointment.objects.filter(status="pending").count()
+    confirmed_appointments = ServiceAppointment.objects.filter(status="confirmed").count()
+    completed_appointments = ServiceAppointment.objects.filter(status="completed").count()
+
+    # Appointment revenue
+    appointment_revenue = Payment.objects.filter(
+        payment_for="appointment",
+        status="paid"
+    ).aggregate(total=Sum("amount"))["total"] or 0
+
+    # =========================
+    # SHOP
+    # =========================
+    total_products = Product.objects.count()
+    active_products = Product.objects.filter(is_active=True).count()
+
+    total_orders = Order.objects.count()
+    paid_orders = Order.objects.filter(status="paid").count()
+
+    shop_revenue = Payment.objects.filter(
+        payment_for="shop",
+        status="paid"
+    ).aggregate(total=Sum("amount"))["total"] or 0
+
+    # =========================
+    # PAYMENTS (GLOBAL)
+    # =========================
+    total_payments = Payment.objects.count()
+    successful_payments = Payment.objects.filter(status="paid").count()
+    failed_payments = Payment.objects.filter(status="failed").count()
+
+    total_revenue = Payment.objects.filter(
+        status="paid"
+    ).aggregate(total=Sum("amount"))["total"] or 0
+
+    # =========================
+    # CONTEXT
+    # =========================
+    context = {
+        # Users
+        "total_users": total_users,
+        "shelters": shelters,
+        "owners": owners,
+        "adopters": adopters,
+
+        # Pets & Adoptions
+        "total_pets": total_pets,
+        "available_pets": available_pets,
+        "total_adoption_requests": total_adoption_requests,
+        "approved_adoptions": approved_adoptions,
+
+        # Appointments
+        "total_appointments": total_appointments,
+        "pending_appointments": pending_appointments,
+        "confirmed_appointments": confirmed_appointments,
+        "completed_appointments": completed_appointments,
+        "appointment_revenue": appointment_revenue,
+
+        # Shop
+        "total_products": total_products,
+        "active_products": active_products,
+        "total_orders": total_orders,
+        "paid_orders": paid_orders,
+        "shop_revenue": shop_revenue,
+
+        # Payments
+        "total_payments": total_payments,
+        "successful_payments": successful_payments,
+        "failed_payments": failed_payments,
+        "total_revenue": total_revenue,
+    }
+
+    return render(request, "core/admin/dashboard.html", context)
 
 @login_required
 def superadmin_users(request):
@@ -395,6 +553,54 @@ def superadmin_pets(request):
 
     pets = Pet.objects.all().order_by("-id")
     return render(request, "core/admin/pets.html", {"pets": pets})
+# ======================================================
+# SUPER ADMIN – APPOINTMENTS
+# ======================================================
+
+@login_required
+def superadmin_appointments(request):
+    if not request.user.is_superuser:
+        return redirect("home")
+
+    appointments = ServiceAppointment.objects.select_related(
+        "user",
+        "owned_pet__pet",
+        "service"
+    ).order_by("-appointment_date", "-appointment_time")
+
+    return render(
+        request,
+        "core/admin/appointments.html",
+        {
+            "appointments": appointments
+        }
+    )
+
+
+# =========================
+# SUPERADMIN – PAYMENTS
+# =========================
+from django.contrib.auth.decorators import login_required
+from .models import Payment
+
+@login_required
+def superadmin_payments(request):
+    if not request.user.is_superuser:
+        return redirect("home")
+
+    payments = Payment.objects.select_related(
+        "user",
+        "receiver",
+        "appointment",
+        "order",
+        "adoption_request"
+    ).order_by("-created_at")
+
+    return render(
+        request,
+        "core/admin/payments.html",
+        {"payments": payments}
+    )
 
 
 @login_required
@@ -612,7 +818,63 @@ def owner_reject_request(request, req_id):
 
 
 # ---------- SHELTER ----------
+from django.contrib.auth import login, get_user_model
+from django.db import transaction
+from django.contrib import messages
+from .models import ShelterProfile
+
+User = get_user_model()
+
+
 def shelter_signup(request):
+    if request.method == "POST":
+        shelter_name = request.POST.get("shelter_name")
+        email = request.POST.get("email")
+        phone = request.POST.get("phone")
+        address = request.POST.get("address")
+        description = request.POST.get("description", "")
+        password = request.POST.get("password")
+        logo = request.FILES.get("logo")
+
+        # Basic validation
+        if not shelter_name or not email or not password:
+            messages.error(request, "Please fill all required fields.")
+            return render(request, "core/shelter_signup.html")
+
+        try:
+            with transaction.atomic():
+                # Create shelter user
+                user = User.objects.create_user(
+                    username=shelter_name,
+                    email=email,
+                    password=password,
+                )
+                user.role = "shelter"
+                user.phone = phone
+                user.address = address
+
+                if logo:
+                    user.profile_image = logo
+
+                user.save()
+
+                # Create shelter profile
+                ShelterProfile.objects.create(
+                    user=user,
+                    description=description
+                )
+
+                # Auto login
+                login(request, user)
+
+                return redirect("shelter_dashboard")
+
+        except Exception as e:
+            messages.error(
+                request,
+                "Shelter registration failed. Username or email may already exist."
+            )
+
     return render(request, "core/shelter_signup.html")
 
 
@@ -889,19 +1151,26 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .models import Service, OwnedPet
 
+# core/views.py
+
+from .models import Service, OwnedPet, Pet
+
 @login_required
 def appointment_page(request):
-    # Only adopter & owner allowed
-    if request.user.role not in ["adopter", "owner"]:
+    # Allow owner & shelter (adopter still excluded)
+    if request.user.role not in ["owner", "shelter"]:
         return redirect("home")
 
     services = Service.objects.filter(is_active=True)
-
     pets = []
+
+    # OWNER → owned pets
     if request.user.role == "owner":
         pets = OwnedPet.objects.filter(owner=request.user)
 
-    # adopter gets NO pets here (custom pet handled in template later)
+    # SHELTER → shelter pets
+    elif request.user.role == "shelter":
+        pets = Pet.objects.filter(added_by=request.user)
 
     return render(
         request,
@@ -909,6 +1178,7 @@ def appointment_page(request):
         {
             "services": services,
             "pets": pets,
+            "role": request.user.role,  # helpful for template logic
         }
     )
 

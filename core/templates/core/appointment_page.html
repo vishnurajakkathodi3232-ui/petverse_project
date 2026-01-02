@@ -1,17 +1,21 @@
 {% extends "core/base_inner.html" %}
-
 {% load static %}
 
 {% block content %}
+
+
+
 <section id="appointment" style="margin-top:120px;">
     <div class="container">
         <div class="row">
 
+            <!-- IMAGE -->
             <div class="col-md-6 col-sm-6">
                 <img src="{% static 'core/images/appointment-image.jpg' %}"
                      class="img-responsive" alt="">
             </div>
 
+            <!-- FORM -->
             <div class="col-md-6 col-sm-6">
                 <form method="post" action="{% url 'appointment' %}">
                     {% csrf_token %}
@@ -20,13 +24,17 @@
                         <h2>Make an Appointment</h2>
                     </div>
 
+                    <!-- PET -->
                     <select class="form-control" name="pet_id" required>
                         <option value="">Select Your Pet</option>
                         {% for pet in pets %}
-                            <option value="{{ pet.id }}">{{ pet.pet.name }}</option>
+                            <option value="{{ pet.id }}">
+                                {{ pet.pet.name }}
+                            </option>
                         {% endfor %}
                     </select>
 
+                    <!-- SERVICE -->
                     <select class="form-control" name="service_id" required>
                         <option value="">Select Service</option>
                         {% for service in services %}
@@ -36,17 +44,28 @@
                         {% endfor %}
                     </select>
 
+                    <!-- DATE -->
                     <input type="date" class="form-control" name="date" required>
+
+                    <!-- TIME -->
                     <input type="time" class="form-control" name="time" required>
 
+                    <!-- NOTES -->
                     <textarea class="form-control" name="message"
                               placeholder="Additional notes"></textarea>
 
-                    <button type="submit" class="form-control">Submit</button>
+                    <!-- SUBMIT -->
+                    <button type="submit"
+                        id="cf-submit"
+                        class="form-control">
+                            Submit
+                    </button>
+
                 </form>
             </div>
 
         </div>
     </div>
 </section>
+
 {% endblock %}

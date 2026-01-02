@@ -50,6 +50,12 @@ urlpatterns = [
     path("shelter/pets/delete/<int:pet_id>/", views.shelter_delete_pet, name="shelter_delete_pet"),
     path("shelter/pets/list/<int:pet_id>/",views.shelter_mark_available,name="shelter_mark_available"),
 
+    # -------------------- SHELTER APPOINTMENTS --------------------
+    path("shelter/appointments/",views.shelter_appointments,name="shelter_appointments"),
+    path("shelter/appointments/book/",views.appointment_page,name="shelter_appointment_book"),
+
+
+
     path("shelter/pets/unlist/<int:pet_id>/",views.shelter_mark_unavailable,name="shelter_mark_unavailable"),
 
     # Shelter adoption actions
@@ -74,6 +80,7 @@ urlpatterns = [
     path("superadmin/adoptions/",views.superadmin_adoptions,name="admin_adoptions"),
     path("superadmin/adoptions/<int:pk>/approve/",views.admin_approve_adoption,name="admin_approve_adoption"),
     path("superadmin/adoptions/<int:pk>/reject/",views.admin_reject_adoption,name="admin_reject_adoption"),
+    path("superadmin/appointments/", views.superadmin_appointments, name="superadmin_appointments"),
     path("my-services/",views.my_service_appointments,name="my_service_appointments"),
    
     path("chat/<int:req_id>/", views.chat_room, name="chat_room"),
@@ -81,6 +88,8 @@ urlpatterns = [
     path("payments/<int:payment_id>/review/", views.payment_review, name="payment_review"),
     path("payments/<int:payment_id>/success/",views.payment_success,name="payment_success"),
     path("payments/history/",views.payment_history,name="payment_history"),
+    path("superadmin/payments/",views.superadmin_payments,name="superadmin_payments"),
+
     
     # Appointment Payments
     path("appointment/payment/review/<int:appointment_id>/",views.appointment_payment_review,name="appointment_payment_review"),

@@ -9,128 +9,158 @@
     <link rel="stylesheet" href="{% static 'core/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'core/css/font-awesome.min.css' %}">
 
-    <!-- Dark Admin Styles -->
-    <style>
-        body {
-            margin: 0;
-            background: #0b1020;
-            color: #c3c0c4ff;
-            font-family: 'Segoe UI', sans-serif;
-        }
+<style>
+    body {
+        margin: 0;
+        background: #0b1020;
+        color: #cbd5f5;
+        font-family: 'Segoe UI', sans-serif;
+    }
 
-        /* ===== Layout ===== */
-        .admin-wrapper {
-            display: flex;
-            min-height: 100vh;
-            width: 100%;
-        }
+    /* ===== Layout ===== */
+    .admin-wrapper {
+        display: flex;
+        min-height: 100vh;
+        width: 100%;
+    }
 
-        /* ===== Sidebar ===== */
-        .admin-sidebar {
-            width: 260px;
-            background: #0f172a;
-            padding: 20px;
-            border-right: 1px solid #1e293b;
-            flex-shrink: 0;
-        }
+    /* ===== Sidebar ===== */
+    .admin-sidebar {
+        width: 260px;
+        background: #0f172a;
+        padding: 20px;
+        border-right: 1px solid #1e293b;
+        flex-shrink: 0;
+    }
 
-        .admin-logo {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 30px;
-            color: #a855f7;
-        }
+    .admin-logo {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 30px;
+        color: #a855f7;
+    }
 
-        .admin-sidebar ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+    .admin-sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
 
-        .admin-sidebar li {
-            margin-bottom: 10px;
-        }
+    .admin-sidebar li {
+        margin-bottom: 8px;
+    }
 
-        .admin-sidebar a {
-            display: block;
-            padding: 10px 14px;
-            border-radius: 6px;
-            color: #cbd5f5;
-            text-decoration: none;
-            transition: 0.2s;
-        }
+    .admin-sidebar a {
+        display: block;
+        padding: 10px 14px;
+        border-radius: 6px;
+        color: #cbd5f5;
+        text-decoration: none;
+        transition: background 0.2s ease;
+    }
 
-        .admin-sidebar a i {
-            margin-right: 10px;
-        }
+    .admin-sidebar a i {
+        margin-right: 10px;
+    }
 
-        .admin-sidebar a:hover,
-        .admin-sidebar a.active {
-            background: #1e293b;
-            color: #ffffff;
-        }
+    .admin-sidebar a:hover,
+    .admin-sidebar a.active {
+        background: #1e293b;
+        color: #ffffff;
+    }
 
-        /* ===== Main Area ===== */
-        .admin-main {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-width: 0; /* VERY IMPORTANT */
-        }
+    .sidebar-section {
+        margin-top: 25px;
+        margin-bottom: 8px;
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #64748b;
+        padding-left: 6px;
+        letter-spacing: 0.5px;
+    }
 
-        /* ===== Topbar ===== */
-        .admin-topbar {
-            background: #0f172a;
-            padding: 14px 30px;
-            border-bottom: 1px solid #1e293b;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    /* ===== Main ===== */
+    .admin-main {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-width: 0;
+    }
 
-        .admin-user {
-            font-size: 14px;
-        }
+    /* ===== Topbar ===== */
+    .admin-topbar {
+        background: #0f172a;
+        padding: 14px 30px;
+        border-bottom: 1px solid #1e293b;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-        .admin-user a {
-            color: #a855f7;
-            text-decoration: none;
-            margin-left: 10px;
-        }
+    .admin-user {
+        font-size: 14px;
+    }
 
-        /* ===== Content ===== */
-        .admin-content {
-            flex: 1;
-            padding: 24px 30px;
-            overflow-x: auto;
-        }
+    .admin-user a {
+        color: #a855f7;
+        text-decoration: none;
+        margin-left: 10px;
+    }
 
-        /* ===== Cards ===== */
-        .stat-card {
-            background: #111827;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid #1e293b;
-            transition: 0.2s;
-        }
+    /* ===== Content ===== */
+    .admin-content {
+        flex: 1;
+        padding: 24px 30px;
+        overflow-x: auto;
+    }
 
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
+    /* ===== Cards ===== */
+    .stat-card {
+        background: #111827;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #1e293b;
+    }
 
-        .stat-title {
-            font-size: 14px;
-            color: #9ca3af;
-        }
+    /* =====================================================
+       DARK TABLE FIX (KILLS BOOTSTRAP WHITE STRIPES)
+       ===================================================== */
 
-        .stat-value {
-            font-size: 28px;
-            font-weight: bold;
-            margin-top: 5px;
-        }
-    </style>
+    .admin-content table {
+        width: 100%;
+        background-color: #0f172a !important;
+        color: #e5e7eb;
+        border-collapse: collapse;
+    }
+
+    .admin-content table thead th {
+        background-color: #111827 !important;
+        color: #cbd5f5;
+        border-bottom: 1px solid #1e293b;
+    }
+
+    .admin-content table tbody tr {
+        background-color: #0f172a !important;
+    }
+
+    .admin-content table tbody tr:nth-of-type(odd),
+    .admin-content table tbody tr:nth-of-type(even) {
+        background-color: #0f172a !important;
+    }
+
+    .admin-content table tbody tr:hover {
+        background-color: #1e293b !important;
+    }
+
+    .admin-content table td,
+    .admin-content table th {
+        border-color: #1e293b !important;
+        padding: 12px;
+        vertical-align: middle;
+    }
+</style>
+
 
     {% block extra_css %}{% endblock %}
 </head>
@@ -141,11 +171,11 @@
 
     <!-- SIDEBAR -->
     <aside class="admin-sidebar">
-        <div class="admin-logo">
-            🐾 PetVerse Admin
-        </div>
+
+        <div class="admin-logo">🐾 PetVerse Admin</div>
 
         <ul>
+            <!-- DASHBOARD -->
             <li>
                 <a href="{% url 'superadmin_dashboard' %}"
                    class="{% if request.resolver_match.url_name == 'superadmin_dashboard' %}active{% endif %}">
@@ -153,27 +183,66 @@
                 </a>
             </li>
 
+            <!-- USERS -->
             <li>
                 <a href="{% url 'admin_users' %}"
                    class="{% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}">
                     <i class="fa fa-users"></i> Users
                 </a>
             </li>
+
+            <!-- PETS -->
             <li>
                 <a href="{% url 'admin_pets' %}"
-                    class="{% if request.resolver_match.url_name == 'admin_pets' %}active{% endif %}">
+                   class="{% if request.resolver_match.url_name == 'admin_pets' %}active{% endif %}">
                     <i class="fa fa-paw"></i> Pets
                 </a>
             </li>
+
+            <!-- ADOPTIONS -->
             <li>
                 <a href="{% url 'admin_adoptions' %}"
-                    class="{% if request.resolver_match.url_name == 'admin_adoptions' %}active{% endif %}">
+                   class="{% if request.resolver_match.url_name == 'admin_adoptions' %}active{% endif %}">
                     <i class="fa fa-heart"></i> Adoptions
                 </a>
             </li>
 
+            <div class="sidebar-section">Appointments</div>
 
+            <!-- APPOINTMENTS -->
+            <li>
+                <a href="{% url 'superadmin_appointments' %}"
+                   class="{% if request.resolver_match.url_name == 'superadmin_appointments' %}active{% endif %}">
+                    <i class="fa fa-calendar"></i> Appointments
+                </a>
+            </li>
+
+            <div class="sidebar-section">Shop</div>
+
+            <!-- PRODUCTS (future scope) -->
+            <li>
+                <a href="javascript:void(0);" title="Coming soon">
+                    <i class="fa fa-cube"></i> Products
+                </a>
+            </li>
+
+            <!-- ORDERS -->
+            <li>
+                <a href="{% url 'superadmin_orders' %}"
+                   class="{% if request.resolver_match.url_name == 'superadmin_orders' %}active{% endif %}">
+                    <i class="fa fa-shopping-cart"></i> Orders
+                </a>
+            </li>
+
+            <!-- PAYMENTS (SYSTEM-WIDE) -->
+            <li>
+                <a href="{% url 'superadmin_payments' %}"
+                   class="{% if request.resolver_match.url_name == 'superadmin_payments' %}active{% endif %}">
+                    <i class="fa fa-credit-card"></i> Payments
+                </a>
+            </li>
         </ul>
+
     </aside>
 
     <!-- MAIN -->
@@ -182,7 +251,6 @@
         <!-- TOPBAR -->
         <div class="admin-topbar">
             <div>System Overview</div>
-
             <div class="admin-user">
                 {{ request.user.username }}
                 <a href="{% url 'logout' %}">Logout</a>
@@ -195,6 +263,7 @@
         </div>
 
     </div>
+
 </div>
 
 <script src="{% static 'core/js/bootstrap.min.js' %}"></script>

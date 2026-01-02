@@ -282,7 +282,15 @@
             </li>
 
             <li>
-                <a href="{% url 'chat' %}"
+                <a href="{% url 'shelter_appointments' %}"
+                    class="{% if request.resolver_match.url_name == 'shelter_appointments' %}active{% endif %}">
+                    <i class="fa fa-calendar"></i> Appointments
+                </a>
+            </li>
+
+
+            <li>
+                <a href="{% url 'chat_inbox' %}"
                    class="{% if request.resolver_match.url_name == 'chat' %}active{% endif %}">
                     <i class="fa fa-comments"></i> Chat
                 </a>

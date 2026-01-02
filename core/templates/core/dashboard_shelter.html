@@ -4,58 +4,136 @@
 
 {% block content %}
 
-<h2 class="mb-3">Shelter Dashboard 🏠</h2>
-<p class="text-muted">Manage shelter pets and adoption requests.</p>
+<style>
+    .dashboard-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+    }
+
+    .dashboard-header h2 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .dashboard-subtitle {
+        color: #777;
+        margin-bottom: 25px;
+    }
+
+    .dash-card {
+        border-radius: 10px;
+        transition: all 0.25s ease;
+        height: 100%;
+    }
+
+    .dash-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+    }
+
+    .dash-card .panel-body {
+        padding: 25px 20px;
+    }
+
+    .dash-icon {
+        font-size: 38px;
+        margin-bottom: 12px;
+    }
+
+    .chat-panel {
+        margin-top: 25px;
+    }
+</style>
+
+<!-- HEADER -->
+<div class="dashboard-header">
+    <h2>Shelter Dashboard 🏠</h2>
+</div>
+
+<p class="dashboard-subtitle">
+    Manage shelter pets, adoptions, and appointments.
+</p>
 
 <hr>
 
+<!-- DASHBOARD CARDS -->
 <div class="row">
 
-    <div class="col-md-4">
-        <div class="panel panel-default text-center">
+    <!-- SHELTER PETS -->
+    <div class="col-md-3">
+        <div class="panel panel-default text-center dash-card">
             <div class="panel-body">
-                <i class="fa fa-paw fa-3x text-primary"></i>
+                <i class="fa fa-paw dash-icon text-primary"></i>
                 <h4>Shelter Pets</h4>
                 <p class="text-muted">View & manage pets</p>
-                <a href="{% url 'shelter_pets' %}" class="btn btn-primary btn-sm">Manage</a>
+                <a href="{% url 'shelter_pets' %}" class="btn btn-primary btn-sm">
+                    Manage
+                </a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="panel panel-default text-center">
+    <!-- ADD PET -->
+    <div class="col-md-3">
+        <div class="panel panel-default text-center dash-card">
             <div class="panel-body">
-                <i class="fa fa-plus fa-3x text-success"></i>
+                <i class="fa fa-plus dash-icon text-success"></i>
                 <h4>Add Pet</h4>
                 <p class="text-muted">Register new pet</p>
-                <a href="{% url 'shelter_add_pet' %}" class="btn btn-success btn-sm">Add</a>
+                <a href="{% url 'shelter_add_pet' %}" class="btn btn-success btn-sm">
+                    Add
+                </a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="panel panel-default text-center">
+    <!-- ADOPTIONS -->
+    <div class="col-md-3">
+        <div class="panel panel-default text-center dash-card">
             <div class="panel-body">
-                <i class="fa fa-heart fa-3x text-danger"></i>
+                <i class="fa fa-heart dash-icon text-danger"></i>
                 <h4>Adoptions</h4>
                 <p class="text-muted">Review requests</p>
-                <a href="{% url 'shelter_adoptions' %}" class="btn btn-danger btn-sm">View</a>
+                <a href="{% url 'shelter_adoptions' %}" class="btn btn-danger btn-sm">
+                    View
+                </a>
             </div>
         </div>
     </div>
+<!-- BOOK APPOINTMENT -->
+<div class="col-md-3">
+    <div class="panel panel-default text-center dash-card">
+        <div class="panel-body">
+            <i class="fa fa-calendar-plus-o dash-icon text-warning"></i>
+            <h4>Book Appointment</h4>
+            <p class="text-muted">Schedule pet services</p>
+            <a href="{% url 'shelter_appointment_book' %}"
+               class="btn btn-warning btn-sm">
+                Book
+            </a>
+        </div>
+    </div>
+</div>
+
+
 
 </div>
 
-<hr>
-
-<div class="panel panel-info">
+<!-- CHAT SECTION -->
+<div class="panel panel-info chat-panel">
     <div class="panel-heading">
-        <strong><i class="fa fa-comments"></i> Shelter Chat</strong>
+        <strong>
+            <i class="fa fa-comments"></i> Shelter Chat
+        </strong>
     </div>
     <div class="panel-body">
-        Communicate with adopters and support.
+        Communicate with adopters and support staff.
         <br><br>
-        <a href="#" class="btn btn-info btn-sm">Open Chat</a>
+        <a href="{% url 'chat_inbox' %}" class="btn btn-info btn-sm">
+            Open Chat
+        </a>
     </div>
 </div>
 

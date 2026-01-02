@@ -788,6 +788,22 @@ http://www.tooplate.com/view/2098-health
     color: #ffffff;
   }
 
+  /* ===============================
+   FIX: Appointment dropdown text
+   =============================== */
+
+#appointment select,
+#appointment select option,
+#appointment input,
+#appointment textarea {
+    color: #222 !important;
+}
+
+#appointment select option {
+    background-color: #ffffff;
+}
+
+
 
   /*---------------------------------------
      FOOTER              
@@ -1054,4 +1070,24 @@ http://www.tooplate.com/view/2098-health
     }
 
   }
+/* ===============================
+   FINAL FIX: Selected pet text invisible
+   =============================== */
 
+/* Closed select (selected value) */
+#appointment select.form-control {
+    color: #222 !important;
+    background-color: #f9f9f9;
+}
+
+/* Selected option when dropdown is closed */
+#appointment select option:checked {
+    color: #222 !important;
+    background-color: #ffffff !important;
+}
+
+/* Dropdown list */
+#appointment select option {
+    color: #222 !important;
+    background-color: #ffffff !important;
+}
