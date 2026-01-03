@@ -191,12 +191,12 @@
             </li>
 
             <li>
-                <a href="{% url 'payment' %}"
-                    class="{% if request.resolver_match.url_name == 'payment' %}active{% endif %}">
+                <a href="{% url 'payment_history' %}"
+                    class="{% if request.resolver_match.url_name == 'payment_history' %}active{% endif %}">
                     <i class="fa fa-credit-card"></i> Payments
                 </a>
-
             </li>
+
 
             <li>
                 <a href="{% url 'adopter_profile' %}"

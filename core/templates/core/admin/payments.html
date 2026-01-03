@@ -9,7 +9,67 @@
 
 <hr>
 
-<table class="table table-dark table-striped">
+<style>
+    /* Override bootstrap table completely */
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #0f172a;
+        color: #cbd5f5;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .admin-table thead {
+        background: #111827;
+    }
+
+    .admin-table th {
+        padding: 14px;
+        font-weight: 600;
+        font-size: 14px;
+        border-bottom: 1px solid #1e293b;
+        color: #e5e7eb;
+    }
+
+    .admin-table td {
+        padding: 14px;
+        border-bottom: 1px solid #1e293b;
+        font-size: 14px;
+    }
+
+    .admin-table tbody tr {
+        background: #0f172a;
+        transition: background 0.2s ease;
+    }
+
+    .admin-table tbody tr:hover {
+        background: #111827;
+    }
+
+    .badge-paid {
+        color: #16a34a;
+        font-weight: 600;
+    }
+
+    .badge-pending {
+        color: #eab308;
+        font-weight: 600;
+    }
+
+    .badge-failed {
+        color: #dc2626;
+        font-weight: 600;
+    }
+
+    .empty-row {
+        text-align: center;
+        padding: 20px;
+        color: #94a3b8;
+    }
+</style>
+
+<table class="admin-table">
     <thead>
         <tr>
             <th>ID</th>
@@ -25,10 +85,18 @@
         {% for p in payments %}
         <tr>
             <td>#{{ p.id }}</td>
-            <td>{{ p.user.username }}</td>
+            <td>{{ p.user.username|default:"System" }}</td>
             <td>{{ p.payment_for|capfirst }}</td>
             <td>₹ {{ p.amount }}</td>
-            <td>{{ p.status|capfirst }}</td>
+            <td>
+                {% if p.status == "paid" %}
+                    <span class="badge-paid">Paid</span>
+                {% elif p.status == "pending" %}
+                    <span class="badge-pending">Pending</span>
+                {% else %}
+                    <span class="badge-failed">Failed</span>
+                {% endif %}
+            </td>
             <td>
                 {% if p.appointment %}
                     Appointment #{{ p.appointment.id }}
@@ -44,7 +112,7 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="7" class="text-center text-muted">
+            <td colspan="7" class="empty-row">
                 No payments found.
             </td>
         </tr>

@@ -544,19 +544,28 @@ def superadmin_users(request):
 
     users = User.objects.all().order_by("-date_joined")
     return render(request, "core/admin/users.html", {"users": users})
-
-
 @login_required
 def superadmin_pets(request):
     if not request.user.is_superuser:
         return redirect("home")
 
-    pets = Pet.objects.all().order_by("-id")
-    return render(request, "core/admin/pets.html", {"pets": pets})
+    pets = Pet.objects.all()
+
+    # Filter: available pets
+    if request.GET.get("available") == "1":
+        pets = pets.filter(is_available=True)
+
+    pets = pets.order_by("-id")
+
+    return render(
+        request,
+        "core/admin/pets.html",
+        {"pets": pets}
+    )
+
 # ======================================================
 # SUPER ADMIN – APPOINTMENTS
 # ======================================================
-
 @login_required
 def superadmin_appointments(request):
     if not request.user.is_superuser:
@@ -566,23 +575,29 @@ def superadmin_appointments(request):
         "user",
         "owned_pet__pet",
         "service"
-    ).order_by("-appointment_date", "-appointment_time")
+    )
+
+    # Filter by appointment status
+    status = request.GET.get("status")
+    if status in ["pending", "confirmed", "completed"]:
+        appointments = appointments.filter(status=status)
+
+    appointments = appointments.order_by(
+        "-appointment_date",
+        "-appointment_time"
+    )
 
     return render(
         request,
         "core/admin/appointments.html",
-        {
-            "appointments": appointments
-        }
+        {"appointments": appointments}
     )
-
 
 # =========================
 # SUPERADMIN – PAYMENTS
 # =========================
 from django.contrib.auth.decorators import login_required
 from .models import Payment
-
 @login_required
 def superadmin_payments(request):
     if not request.user.is_superuser:
@@ -594,14 +609,25 @@ def superadmin_payments(request):
         "appointment",
         "order",
         "adoption_request"
-    ).order_by("-created_at")
+    )
+
+    # Filter by status
+    status = request.GET.get("status")
+    if status in ["paid", "pending", "failed"]:
+        payments = payments.filter(status=status)
+
+    # Filter by payment type
+    payment_for = request.GET.get("for")
+    if payment_for in ["appointment", "shop", "adoption"]:
+        payments = payments.filter(payment_for=payment_for)
+
+    payments = payments.order_by("-created_at")
 
     return render(
         request,
         "core/admin/payments.html",
         {"payments": payments}
     )
-
 
 @login_required
 def superadmin_adoptions(request):
@@ -610,14 +636,20 @@ def superadmin_adoptions(request):
 
     adoptions = AdoptionRequest.objects.select_related(
         "pet", "owned_pet", "adopter"
-    ).order_by("-created_at")
+    )
+
+    # Filter by status (approved / pending / declined)
+    status = request.GET.get("status")
+    if status in ["pending", "approved", "declined"]:
+        adoptions = adoptions.filter(status=status)
+
+    adoptions = adoptions.order_by("-created_at")
 
     return render(
         request,
         "core/admin/adoptions.html",
         {"adoptions": adoptions}
     )
-
 
 @login_required
 def admin_approve_adoption(request, pk):
@@ -1015,8 +1047,21 @@ def payment_history(request):
 def superadmin_orders(request):
     if not request.user.is_superuser:
         return redirect("home")
-    return render(request, "core/admin/orders.html")
 
+    orders = Order.objects.select_related("user")
+
+    # Filter by order status
+    status = request.GET.get("status")
+    if status in ["paid", "pending", "cancelled"]:
+        orders = orders.filter(status=status)
+
+    orders = orders.order_by("-created_at")
+
+    return render(
+        request,
+        "core/admin/orders.html",
+        {"orders": orders}
+    )
 
 @login_required
 def superadmin_analytics(request):
@@ -1428,4 +1473,21 @@ def appointment_payment_success(request, payment_id):
             "appointment": appointment,
             "payment": payment
         }
+    )
+# =========================
+# SUPER ADMIN – PRODUCTS
+# =========================
+@login_required
+def superadmin_products(request):
+    if not request.user.is_superuser:
+        return redirect("home")
+
+    products = Product.objects.select_related(
+        "category"
+    ).order_by("-created_at")
+
+    return render(
+        request,
+        "core/admin/products.html",
+        {"products": products}
     )

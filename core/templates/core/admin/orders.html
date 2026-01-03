@@ -1,30 +1,125 @@
 {% extends "core/admin/base_admin.html" %}
-{% block title %}Orders & Payments{% endblock %}
+
+{% block title %}Orders | Super Admin{% endblock %}
 
 {% block content %}
-<h2>Orders & Payments</h2>
-<p class="text-muted">Adoption & shop transactions</p>
 
-<div class="stat-card">
-    <table class="table table-dark">
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>User</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>#0001</td>
-                <td>demo_user</td>
-                <td>Adoption</td>
-                <td><span class="label label-success">Paid</span></td>
-                <td>₹2,500</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+<h2>Orders</h2>
+<p class="text-muted">
+    All shop orders across the platform
+    {% if active_status %}
+        — <strong>{{ active_status|capfirst }}</strong> orders
+    {% endif %}
+</p>
+
+<hr>
+
+<style>
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #0f172a;
+        color: #cbd5f5;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .admin-table thead {
+        background: #111827;
+    }
+
+    .admin-table th {
+        padding: 14px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #e5e7eb;
+        border-bottom: 1px solid #1e293b;
+        text-align: left;
+    }
+
+    .admin-table td {
+        padding: 14px;
+        font-size: 14px;
+        border-bottom: 1px solid #1e293b;
+    }
+
+    .admin-table tbody tr {
+        background: #0f172a;
+        transition: background 0.2s ease;
+    }
+
+    .admin-table tbody tr:hover {
+        background: #111827;
+    }
+
+    .status-paid {
+        color: #16a34a;
+        font-weight: 600;
+    }
+
+    .status-pending {
+        color: #eab308;
+        font-weight: 600;
+    }
+
+    .status-cancelled,
+    .status-failed {
+        color: #dc2626;
+        font-weight: 600;
+    }
+
+    .empty-row {
+        text-align: center;
+        padding: 20px;
+        color: #94a3b8;
+    }
+</style>
+
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>User</th>
+            <th>Total (₹)</th>
+            <th>Status</th>
+            <th>Created</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>#{{ order.id }}</td>
+
+            <td>
+                {{ order.user.username|default:"Guest" }}
+            </td>
+
+            <td>₹ {{ order.total_amount }}</td>
+
+            <td>
+                {% if order.status == "paid" %}
+                    <span class="status-paid">Paid</span>
+                {% elif order.status == "pending" %}
+                    <span class="status-pending">Pending</span>
+                {% else %}
+                    <span class="status-cancelled">
+                        {{ order.status|capfirst }}
+                    </span>
+                {% endif %}
+            </td>
+
+            <td>{{ order.created_at|date:"d M Y, H:i" }}</td>
+        </tr>
+
+        {% empty %}
+        <tr>
+            <td colspan="5" class="empty-row">
+                No orders found.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% endblock %}

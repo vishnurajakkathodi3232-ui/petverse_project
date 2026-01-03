@@ -89,6 +89,8 @@ urlpatterns = [
     path("payments/<int:payment_id>/success/",views.payment_success,name="payment_success"),
     path("payments/history/",views.payment_history,name="payment_history"),
     path("superadmin/payments/",views.superadmin_payments,name="superadmin_payments"),
+    path("superadmin/products/",views.superadmin_products,name="superadmin_products"),
+
 
     
     # Appointment Payments

@@ -221,8 +221,9 @@
 
             <!-- PRODUCTS (future scope) -->
             <li>
-                <a href="javascript:void(0);" title="Coming soon">
-                    <i class="fa fa-cube"></i> Products
+                <a href="{% url 'superadmin_products' %}"
+                class="{% if request.resolver_match.url_name == 'superadmin_products' %}active{% endif %}">
+                <i class="fa fa-cube"></i> Products
                 </a>
             </li>
 

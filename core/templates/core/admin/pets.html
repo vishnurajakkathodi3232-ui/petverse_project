@@ -3,51 +3,102 @@
 {% block title %}Admin | Pets{% endblock %}
 
 {% block content %}
-<h1 class="mb-3">Pets</h1>
+
+<h2>Pets</h2>
 <p class="text-muted mb-4">Manage all pets listed on the platform</p>
 
-<div class="card bg-dark border border-secondary">
-    <div class="card-body p-0">
+<hr>
 
-        <div class="table-responsive">
-            <table class="table table-dark table-hover mb-0 align-middle">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Pet Name</th>
-                        <th>Category</th>
-                        <th>Available for Adoption</th>
-                        <th>Added By</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for pet in pets %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ pet.name }}</td>
-                        <td>{{ pet.category }}</td>
-                        <td>
-                            {% if pet.is_available %}
-                                <span class="badge bg-success">Yes</span>
-                            {% else %}
-                                <span class="badge bg-secondary">No</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ pet.added_by.username|default:"N/A" }}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="text-center text-muted py-4">
-                            No pets found.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<style>
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #0f172a;
+        color: #cbd5f5;
+        border-radius: 10px;
+        overflow: hidden;
+    }
 
-    </div>
-</div>
+    .admin-table thead {
+        background: #111827;
+    }
+
+    .admin-table th {
+        padding: 14px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #e5e7eb;
+        border-bottom: 1px solid #1e293b;
+        text-align: left;
+    }
+
+    .admin-table td {
+        padding: 14px;
+        font-size: 14px;
+        border-bottom: 1px solid #1e293b;
+    }
+
+    .admin-table tbody tr {
+        background: #0f172a;
+        transition: background 0.2s ease;
+    }
+
+    .admin-table tbody tr:hover {
+        background: #111827;
+    }
+
+    .status-yes {
+        color: #22c55e;
+        font-weight: 600;
+    }
+
+    .status-no {
+        color: #94a3b8;
+        font-weight: 600;
+    }
+
+    .empty-row {
+        text-align: center;
+        padding: 20px;
+        color: #94a3b8;
+    }
+</style>
+
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Pet Name</th>
+            <th>Category</th>
+            <th>Available for Adoption</th>
+            <th>Added By</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for pet in pets %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ pet.name }}</td>
+            <td>{{ pet.category }}</td>
+            <td>
+                {% if pet.is_available %}
+                    <span class="status-yes">Yes</span>
+                {% else %}
+                    <span class="status-no">No</span>
+                {% endif %}
+            </td>
+            <td>{{ pet.added_by.username|default:"N/A" }}</td>
+        </tr>
+
+        {% empty %}
+        <tr>
+            <td colspan="5" class="empty-row">
+                No pets found.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% endblock %}
