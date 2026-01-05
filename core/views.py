@@ -1199,22 +1199,20 @@ from .models import Service, OwnedPet
 # core/views.py
 
 from .models import Service, OwnedPet, Pet
-
 @login_required
 def appointment_page(request):
-    # Allow owner & shelter (adopter still excluded)
+    # Only owner & shelter can book services
     if request.user.role not in ["owner", "shelter"]:
-        return redirect("home")
+        return redirect("dashboard")
 
     services = Service.objects.filter(is_active=True)
-    pets = []
 
     # OWNER → owned pets
     if request.user.role == "owner":
         pets = OwnedPet.objects.filter(owner=request.user)
 
     # SHELTER → shelter pets
-    elif request.user.role == "shelter":
+    else:  # shelter
         pets = Pet.objects.filter(added_by=request.user)
 
     return render(
@@ -1223,10 +1221,9 @@ def appointment_page(request):
         {
             "services": services,
             "pets": pets,
-            "role": request.user.role,  # helpful for template logic
+            "role": request.user.role,
         }
     )
-
 from .models import ChatRoom, ChatMessage
 
 
@@ -1394,7 +1391,6 @@ from .models import Payment
 from .utils import send_appointment_payment_receipt
 
 
-
 @csrf_exempt
 @login_required
 def appointment_payment_success(request, payment_id):
@@ -1403,7 +1399,7 @@ def appointment_payment_success(request, payment_id):
     """
 
     if request.method != "POST":
-        return redirect("adopter_appointments")
+        return redirect("payment_history")
 
     payment = get_object_or_404(
         Payment,
@@ -1415,15 +1411,13 @@ def appointment_payment_success(request, payment_id):
     appointment = payment.appointment
 
     # Prevent duplicate processing
-    if appointment.status == "confirmed":
-        return redirect("adopter_appointments")
+    if appointment and appointment.status == "confirmed":
+        return redirect("payment_history")
 
-    # Razorpay response values
     razorpay_payment_id = request.POST.get("razorpay_payment_id")
     razorpay_order_id = request.POST.get("razorpay_order_id")
     razorpay_signature = request.POST.get("razorpay_signature")
 
-    # 🛑 Safety check
     if razorpay_order_id != payment.razorpay_order_id:
         payment.status = "failed"
         payment.save()
@@ -1433,13 +1427,11 @@ def appointment_payment_success(request, payment_id):
             {"appointment": appointment}
         )
 
-    # Razorpay client
     client = razorpay.Client(
         auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
     )
 
     try:
-        # 🔐 Signature verification
         client.utility.verify_payment_signature({
             "razorpay_payment_id": razorpay_payment_id,
             "razorpay_order_id": razorpay_order_id,
@@ -1448,32 +1440,33 @@ def appointment_payment_success(request, payment_id):
     except razorpay.errors.SignatureVerificationError:
         payment.status = "failed"
         payment.save()
-
         return render(
             request,
             "core/appointments/payment_failed.html",
             {"appointment": appointment}
         )
 
-    # ✅ VERIFIED PAYMENT
+    # ✅ FINAL CONFIRMATION
     payment.status = "paid"
-    payment.payment_id = razorpay_payment_id
+    payment.razorpay_payment_id = razorpay_payment_id
+    payment.razorpay_signature = razorpay_signature
     payment.save()
 
-    appointment.status = "confirmed"
-    appointment.save()
+    if appointment:
+        appointment.status = "confirmed"
+        appointment.save()
 
-    # 📧 SEND EMAIL RECEIPT
     send_appointment_payment_receipt(payment)
 
     return render(
         request,
         "core/payment_success.html",
         {
-            "appointment": appointment,
-            "payment": payment
+            "payment": payment,
+            "appointment": appointment
         }
     )
+
 # =========================
 # SUPER ADMIN – PRODUCTS
 # =========================

@@ -169,19 +169,9 @@
                 </a>
             </li>
 
-            <li>
-                <a href="{% url 'adopter_favorites' %}"
-                   class="{% if request.resolver_match.url_name == 'adopter_favorites' %}active{% endif %}">
-                    <i class="fa fa-star"></i> Favorites
-                </a>
-            </li>
+            
 
-            <li>
-                <a href="{% url 'adopter_appointments' %}"
-                   class="{% if request.resolver_match.url_name == 'adopter_appointments' %}active{% endif %}">
-                    <i class="fa fa-calendar"></i> Appointments
-                </a>
-            </li>
+          
 
             <li>
                 <a href="{% url 'chat_inbox' %}"

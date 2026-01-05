@@ -1,4 +1,4 @@
-{% extends "core/base.html" %}
+{% extends "core/base_inner.html" %}
 {% load static %}
 
 {% block content %}
@@ -40,11 +40,23 @@
                 Your order has been confirmed and is being processed.
             </p>
 
+            <!-- RECEIPT DOWNLOAD -->
+            {% if payment %}
+            <div class="alert alert-success mt-4">
+                📄 Your payment receipt is ready.
+            </div>
+
+            <a href="{% url 'download_payment_receipt' payment.id %}"
+               class="btn btn-success mb-3">
+                <i class="fa fa-file-pdf-o"></i> Download Receipt
+            </a>
+            {% else %}
             <!-- FUTURE AREA (DO NOT REMOVE) -->
             <div class="alert alert-info mt-4">
                 📄 Invoice & receipt will be sent to your registered email.<br>
                 (PDF download will be enabled soon)
             </div>
+            {% endif %}
 
             <div class="mt-4">
                 <a href="{% url 'shop:my_orders' %}" class="btn btn-default">

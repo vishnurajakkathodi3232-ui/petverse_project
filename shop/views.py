@@ -7,6 +7,8 @@ from .models import Product, ProductCategory
 import razorpay
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+from core.models import Payment as CorePayment
+
 
 
 def product_list(request):
@@ -203,7 +205,9 @@ def checkout(request):
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Order, Payment
+from .models import Order
+from core.models import Payment
+
 import razorpay
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
@@ -246,18 +250,19 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Order, Payment
+
 
 
 from .utils_email import send_order_invoice_email
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
-from .models import Order, Payment
-@csrf_exempt  # Razorpay may POST here later
+
+
+@csrf_exempt
 @login_required
 def payment_success(request, order_id):
     """
-    Razorpay payment success (safe client-side confirmation)
+    Razorpay payment success (Shop)
     """
 
     order = get_object_or_404(
@@ -268,29 +273,41 @@ def payment_success(request, order_id):
 
     # Prevent duplicate processing
     if order.status == "paid":
-        return render(request, "shop/payment_success.html", {"order": order})
+        payment = Payment.objects.filter(order=order).first()
+        return render(
+            request,
+            "shop/payment_success.html",
+            {
+                "order": order,
+                "payment": payment
+            }
+        )
 
-    # Create or update payment safely
-    payment, created = Payment.objects.get_or_create(
+    # ✅ CREATE CORE PAYMENT RECORD
+    payment = Payment.objects.create(
+        user=request.user,
+        payment_for="shop",
+        amount=order.total_amount,
+        status="paid",
         order=order,
-        defaults={
-            "status": "paid",
-            "payment_id": "RAZORPAY_TEST"
-        }
+        razorpay_payment_id="RAZORPAY_TEST"
     )
-
-    if not created:
-        payment.status = "paid"
-        payment.save()
 
     # Mark order as paid
     order.status = "paid"
     order.save()
 
-    # 📧 Send invoice email (SAFE MODE)
+    # 📧 Send invoice email
     send_order_invoice_email(order)
 
-    return render(request, "shop/payment_success.html", {"order": order})
+    return render(
+        request,
+        "shop/payment_success.html",
+        {
+            "order": order,
+            "payment": payment
+        }
+    )
 
 from django.contrib.auth.decorators import login_required
 from .models import Order
