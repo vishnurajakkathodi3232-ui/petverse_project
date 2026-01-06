@@ -23,3 +23,6 @@ class LogoutView(auth_views.LogoutView):
 @login_required
 def profile_view(request):
     return render(request, 'accounts/profile.html')
+
+class LoginView(auth_views.LoginView):
+    template_name = 'accounts/login.html'

@@ -192,7 +192,8 @@ def signup(request):
         return redirect("home")
 
     return render(request, "core/signup.html")
-
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
 
 def user_login(request):
     if request.method == "POST":
@@ -205,9 +206,13 @@ def user_login(request):
             login(request, user)
             return redirect("dashboard")
 
-        return render(request, "core/login.html", {"error": "Invalid credentials"})
+        return render(
+            request,
+            "core/accounts/login.html",
+            {"error": "Invalid credentials"},
+        )
 
-    return render(request, "core/login.html")
+    return render(request, "core/accounts/login.html")
 
 
 def user_logout(request):
